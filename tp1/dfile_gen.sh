@@ -27,6 +27,20 @@ services:
       retries: 5
     logging:
       driver: none
+  watcher:
+    container_name: watcher
+    build:
+      context: ./
+      dockerfile: ./watcher/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
   client:
     container_name: client
     build:
