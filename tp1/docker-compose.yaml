@@ -25,7 +25,7 @@ services:
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - LOGGING_LEVEL=INFO
+      - LOGGING_LEVEL=DEBUG
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   client:

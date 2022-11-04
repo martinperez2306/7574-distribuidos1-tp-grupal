@@ -5,7 +5,7 @@ from .worker import Worker
 class HeartbeathedWorker(Worker):
     def __init__(self, middleware) -> None:
         super().__init__(middleware)
-        self.heartbeat_middleware = HeartbeatMiddleware()
+        self.heartbeat_middleware = HeartbeatMiddleware(self.id)
 
     def start(self):
         try:

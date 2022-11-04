@@ -2,6 +2,7 @@ import logging
 import os
 import signal
 import pika
+import docker
 
 from src.heartbeats import Heartbeats
 
@@ -13,6 +14,7 @@ class Watcher:
         self.channel = None
         self.tries = 0
         self.heartbeats = Heartbeats()
+        self.docker = docker.from_env()
         signal.signal(signal.SIGTERM, self.exit_gracefully)
         signal.signal(signal.SIGINT, self.exit_gracefully)
 
@@ -39,14 +41,19 @@ class Watcher:
                 logging.info(method_frame)
                 logging.info(properties)
                 logging.info(body)
-
+                self.heartbeats.hearbeat(body.decode())
                 # Acknowledge the message
                 self.channel.basic_ack(method_frame.delivery_tag)
 
-            self.heartbeats.hearbeat(body)
-            self.heartbeats.check_services()
+            unavailable_services = self.heartbeats.get_unavailable_services()
+            self.wake_up_services(unavailable_services)
 
         self.close()
+
+    def wake_up_services(self, unavailable_services: list):
+        for service in unavailable_services:
+            self.docker.api.stop(service)
+            self.docker.api.start(service)
     
     def close(self):
         # Cancel the consumer and return any pending messages
