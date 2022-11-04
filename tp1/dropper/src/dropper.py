@@ -3,7 +3,7 @@ from io import StringIO
 import logging
 
 from common.message import FileMessage, MessageEnd, VideoMessage
-from common.heartbeathed_worked import HeartbeathedWorker
+from common.heartbeathed_worker import HeartbeathedWorker
 from common.constants import DATA_SUBFIX
 
 
