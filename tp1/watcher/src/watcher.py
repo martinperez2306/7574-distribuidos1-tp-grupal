@@ -1,6 +1,9 @@
 import logging
 import os
+import signal
 import pika
+
+from src.heartbeats import Heartbeats
 
 WATCHER_QUEUE = "watcher_queue"
 
@@ -9,6 +12,10 @@ class Watcher:
         self.connection = None
         self.channel = None
         self.tries = 0
+        self.heartbeats = Heartbeats()
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+
 
     def start(self):
         host = os.environ['RABBIT_SERVER_ADDRESS']
@@ -26,7 +33,6 @@ class Watcher:
 
             if method_frame is None and properties is None and body is None:
                 logging.info("Timeout for receive message")
-                self.tries+=1
 
             else:
                 # Display the message parts
@@ -37,14 +43,20 @@ class Watcher:
                 # Acknowledge the message
                 self.channel.basic_ack(method_frame.delivery_tag)
 
-            # Escape out of the loop after N tries
-            if self.tries == 100:
-                break
+            self.heartbeats.hearbeat(body)
+            self.heartbeats.check_services()
 
+        self.close()
+    
+    def close(self):
         # Cancel the consumer and return any pending messages
         requeued_messages = self.channel.cancel()
         print('Requeued %i messages' % requeued_messages)
-
         # Close the channel and the connection
         self.channel.close()
         self.connection.close()
+
+    def exit_gracefully(self, *args):
+        self.close()
+        logging.info(
+            'Exiting gracefully')
