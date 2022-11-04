@@ -36,9 +36,9 @@ class Watcher:
 
             else:
                 # Display the message parts
-                print(method_frame)
-                print(properties)
-                print(body)
+                logging.info(method_frame)
+                logging.info(properties)
+                logging.info(body)
 
                 # Acknowledge the message
                 self.channel.basic_ack(method_frame.delivery_tag)
@@ -51,7 +51,7 @@ class Watcher:
     def close(self):
         # Cancel the consumer and return any pending messages
         requeued_messages = self.channel.cancel()
-        print('Requeued %i messages' % requeued_messages)
+        logging.info('Requeued %i messages' % requeued_messages)
         # Close the channel and the connection
         self.channel.close()
         self.connection.close()
