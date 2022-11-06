@@ -3,7 +3,7 @@ from common.middleware import Middleware
 from multiprocessing import Process
 import time
 
-WATCHER_QUEUE = 'watcher_queue'
+WATCHER_EXCHANGE = 'watcher_exchange'
 HEARTBEAT_FRECUENCY = 5 #In seconds
 
 logging.getLogger("pika").propagate = False
@@ -12,9 +12,8 @@ class HeartbeatMiddleware(Middleware):
     def __init__(self, heartbeat_id) -> None:
         super().__init__()
         self.reporting = False
-        self.channel.queue_declare(
-            queue=WATCHER_QUEUE)
-        self.channel.basic_qos(prefetch_count=30)
+        self.channel.exchange_declare(exchange=WATCHER_EXCHANGE, exchange_type='fanout')
+        self.channel.basic_qos(prefetch_count=1)
         self.reporting_process: Process = None
         self.heartbeat_id = heartbeat_id
         
@@ -27,11 +26,8 @@ class HeartbeatMiddleware(Middleware):
     def report(self):
         while self.reporting:
             logging.info("Sending heartbeat")
-            super().send_message(WATCHER_QUEUE, self.heartbeat_id)
+            super().send_to_exchange(WATCHER_EXCHANGE, '', self.heartbeat_id)
             time.sleep(HEARTBEAT_FRECUENCY)
-
-    def send_heartbeat_message(self, message):
-        super().send_message(WATCHER_QUEUE, message)
 
     def stop(self):
         self.reporting = False

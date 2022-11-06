@@ -1,4 +1,3 @@
-import logging
 from .heartbeat_middleware import HeartbeatMiddleware
 from .worker import Worker
 
