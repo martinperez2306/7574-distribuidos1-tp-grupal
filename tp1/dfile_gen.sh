@@ -7,6 +7,7 @@ REPLICAS_DROPPER="${2:-1}"
 REPLICAS_TRENDING="${3:-1}"
 REPLICAS_THUMBNAIL="${4:-1}"
 REPLICAS_LIKES_FILTER="${5:-1}"
+REPLICAS_WATCHERS="${6:-1}"
 FILE_NAME="docker-compose.yaml"
 
 FILTER_QTY="5000000"
@@ -27,20 +28,6 @@ services:
       retries: 5
     logging:
       driver: none
-  watcher:
-    container_name: watcher
-    build:
-      context: ./
-      dockerfile: ./watcher/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - LOGGING_LEVEL=INFO
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
   client:
     container_name: client
     build:
@@ -195,6 +182,30 @@ do
       - INSTANCE_NR=${i}"
 
   BASE+="${TRENDING_INSTANCE}"
+done
+
+for (( i = 1; i <= $REPLICAS_WATCHERS; i++ )) 
+do
+  
+  WATCHER_INSTANCE="
+  watcher-${i}:
+    container_name: tp1-watcher-${i}
+    build:
+      context: ./
+      dockerfile: ./watcher/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+      - INSTANCE_ID=${i}
+      - TOTAL_INSTANCES=$REPLICAS_WATCHERS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock"
+
+  BASE+="${WATCHER_INSTANCE}"
 done
 
 echo "${BASE}" > ${FILE_NAME}
