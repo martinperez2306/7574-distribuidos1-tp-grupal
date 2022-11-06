@@ -7,8 +7,8 @@ from multiprocessing import Process, Value
 from src.election import Election, LeaderElection, Leader, LeaderSelected
 from src.election_state import NotParticipating, Participating
 
-MASTER_TIMEOUT = 10
-HEARBEAT_FRECUENCY = 5
+MASTER_TIMEOUT = 5
+HEARBEAT_FRECUENCY = 1
 FIRST_INSTANCE = 1
 
 class HierarchyMiddlware(Middleware):
@@ -64,10 +64,13 @@ class HierarchyMiddlware(Middleware):
                 # Get ten messages and break out
                 for method_frame, properties, body in self.channel.consume(queue=self.queue, inactivity_timeout=MASTER_TIMEOUT):
 
+                    if self.im_leader() or not self.running.value:
+                        break
+
                     heartbeat = None
 
                     if method_frame is None and properties is None and body is None:
-                        logging.info("Timeout for receive Master message")
+                        logging.info("Timeout for receive Master heartbeat")
                         self.start_election()
 
                     else:
@@ -119,14 +122,12 @@ class HierarchyMiddlware(Middleware):
         super().send_message(self.neighbour_queue, election.to_string())
 
     def stop(self):
-        # Cancel the consumer and return any pending messages
-        requeued_messages = self.channel.cancel()
-        logging.info('Requeued %i messages' % requeued_messages)
-        # Close the channel and the connection
-        self.channel.close()
-        self.connection.close()
-
-    def stop(self):
         self.running.value = False
         self.leader_process.join()
         self.listening_process.join()
+        # Cancel the consumer and return any pending messages
+        requeued_messages = self.channel.cancel()
+        logging.info('Requeued %i messages Hierarchy Middleware' % requeued_messages)
+        # Close the channel and the connection
+        self.channel.close()
+        self.connection.close()

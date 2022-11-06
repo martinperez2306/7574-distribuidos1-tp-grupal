@@ -4,7 +4,7 @@ from multiprocessing import Process
 import time
 
 WATCHER_EXCHANGE = 'watcher_exchange'
-HEARTBEAT_FRECUENCY = 5 #In seconds
+HEARTBEAT_FRECUENCY = 1 #In seconds
 
 logging.getLogger("pika").propagate = False
 

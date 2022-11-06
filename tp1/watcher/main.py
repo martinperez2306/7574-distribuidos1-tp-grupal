@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import logging
 import os
-import pika
 
 from src.watcher import Watcher
 
@@ -19,8 +18,7 @@ def main():
     watcher = Watcher()
     watcher.start()
     
-    logging.info(
-        'Bye bye!')
+    logging.info('Bye bye!')
 
 
 def initialize_log(logging_level):
