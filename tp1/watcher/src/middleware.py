@@ -10,20 +10,16 @@ class WatcherMiddlware(Middleware):
     def __init__(self, service_id) -> None:
         super().__init__()
 
-        self.channel.exchange_declare(exchange=WATCHER_EXCHANGE,
-                                      exchange_type='fanout')
-
-        queue=WATCHER_QUEUE + service_id
-        self.channel.queue_declare(queue)
-
-        self.channel.queue_bind(
-            exchange=WATCHER_EXCHANGE, queue=queue)
+        self.queue = WATCHER_QUEUE + "_" + service_id
+        self.channel.exchange_declare(exchange=WATCHER_EXCHANGE, exchange_type='fanout')
+        self.channel.queue_declare(self.queue)
+        self.channel.queue_bind(exchange=WATCHER_EXCHANGE, queue=self.queue)
 
         self.channel.basic_qos(prefetch_count=1)
 
     def accept_heartbeats(self, callback):
         # Get ten messages and break out
-        for method_frame, properties, body in self.channel.consume(queue=WATCHER_QUEUE, inactivity_timeout=10):
+        for method_frame, properties, body in self.channel.consume(queue=self.queue, inactivity_timeout=10):
 
             heartbeat = None
 
