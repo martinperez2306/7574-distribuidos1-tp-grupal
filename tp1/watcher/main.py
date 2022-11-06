@@ -13,6 +13,8 @@ def main():
     # of the component
     logging.info("Watcher starting work")
 
+    logging.getLogger("pika").propagate = False
+
     # Initialize server and start server loop
     watcher = Watcher()
     watcher.start()

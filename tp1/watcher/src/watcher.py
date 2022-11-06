@@ -9,6 +9,7 @@ from src.hierarchy_worker import HierarchyWorker
 WATCHER_QUEUE = "watcher_queue"
 WATCHER_HIERARCHY_QUEUE = "watcher_hierarchy_queue"
 
+logging.getLogger("pika").propagate = False
 
 class Watcher(HierarchyWorker):
     def __init__(self) -> None:
@@ -32,8 +33,8 @@ class Watcher(HierarchyWorker):
         self.wake_up_services(unavailable_services)
 
     def wake_up_services(self, unavailable_services: list):
-        logging.info('Waking up services[{}]')
         if self.im_master():
+            logging.info('Waking up services[{}]')
             for service in unavailable_services:
                 logging.debug("Starting unavailable service [{}]".format(service))
                 self.docker.api.stop(service)

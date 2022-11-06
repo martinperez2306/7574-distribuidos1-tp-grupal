@@ -4,8 +4,6 @@ from common.middleware import Middleware
 WATCHER_EXCHANGE = 'watcher_exchange'
 WATCHER_QUEUE = 'watcher_queue'
 
-logging.getLogger("pika").propagate = False
-
 class WatcherMiddlware(Middleware):
     def __init__(self, service_id) -> None:
         super().__init__()

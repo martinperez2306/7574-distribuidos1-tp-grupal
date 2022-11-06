@@ -27,7 +27,7 @@ class HierarchyMiddlware(Middleware):
         self.queue = self.neighborhood + "_" + str(self.hyerarchy_id)
         self.neighbour_queue = self.neighborhood + "_" + str(self.neighbour_id)
         for slave_id in range(self.hyerarchy_instances):
-            queue = self.neighborhood + "_" + str(slave_id)
+            queue = self.neighborhood + "_" + str(slave_id + 1)
             self.channel.queue_declare(queue)
         self.channel.basic_qos(prefetch_count=1)
 
@@ -50,7 +50,7 @@ class HierarchyMiddlware(Middleware):
                 logging.info("Sending heartbeat to all slaves")
                 for slave_id in range(self.hyerarchy_instances):
                     if slave_id != self.hyerarchy_id:
-                        super().send_message(self.neighborhood + "_" + str(slave_id), MASTER_MESSAGE)
+                        super().send_message(self.neighborhood + "_" + str(slave_id + 1), MASTER_MESSAGE)
                         time.sleep(MASTER_FRECUENCY)
             
     def im_leader(self) -> bool:
@@ -78,7 +78,7 @@ class HierarchyMiddlware(Middleware):
                         self.channel.basic_ack(method_frame.delivery_tag)
                         self.handle_heartbeat(heartbeat)
                     
-    def handle_heartbeat(self, heartbeat):
+    def handle_heartbeat(self, heartbeat: str):
         logging.info('Handling hearbeat [{}]'.format(heartbeat))
         election = Election.of(heartbeat)
         if Leader.is_election(election):
@@ -113,7 +113,8 @@ class HierarchyMiddlware(Middleware):
     def start_election(self):
         logging.info("Starting master election")
         self.leader = None
-        super().send_message(self.neighbour_queue, self.hyerarchy_id)
+        election = LeaderElection(str(self.hyerarchy_id))
+        super().send_message(self.neighbour_queue, election.to_string())
 
     def stop(self):
         # Cancel the consumer and return any pending messages
