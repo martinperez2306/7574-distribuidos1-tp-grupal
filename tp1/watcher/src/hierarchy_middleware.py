@@ -55,7 +55,6 @@ class HierarchyMiddlware(Middleware):
             time.sleep(HEARBEAT_FRECUENCY)
             
     def im_leader(self) -> bool:
-        logging.debug("Leader is [{}]".format(self.leader.value))
         return self.hyerarchy_id == self.leader.value
 
     def accept_heartbeats(self):
