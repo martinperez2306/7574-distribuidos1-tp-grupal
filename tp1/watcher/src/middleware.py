@@ -1,6 +1,4 @@
-from ctypes import c_bool
 import logging
-from multiprocessing import Value
 from common.middleware import Middleware
 from src.heartbeats import SERVICE_TIMEOUT_SECONDS
 
@@ -10,7 +8,7 @@ WATCHER_QUEUE = 'watcher_queue'
 class WatcherMiddlware(Middleware):
     def __init__(self, service_id) -> None:
         super().__init__()
-        self.running = Value(c_bool, False)
+        self.running = False
         self.queue = WATCHER_QUEUE + "_" + service_id
         self.channel.exchange_declare(exchange=WATCHER_EXCHANGE, exchange_type='fanout')
         self.channel.queue_declare(self.queue)
@@ -19,12 +17,12 @@ class WatcherMiddlware(Middleware):
         self.channel.basic_qos(prefetch_count=1)
 
     def run(self):
-        self.running.value = True
+        self.running = True
 
     def accept_heartbeats(self, callback):
         # Get ten messages and break out
         for method_frame, properties, body in self.channel.consume(queue=self.queue, inactivity_timeout=SERVICE_TIMEOUT_SECONDS):
-            if not self.running.value:
+            if not self.running:
                 logging.info("Breacking consume loop")
                 break
 
@@ -51,5 +49,5 @@ class WatcherMiddlware(Middleware):
         self.connection.close()
 
     def stop(self):
-        self.running.value = False
+        self.running = False
         
