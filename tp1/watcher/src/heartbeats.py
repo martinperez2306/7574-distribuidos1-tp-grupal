@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 
-SERVICE_TIMEOUT_SECONDS = 10
+SERVICE_TIMEOUT_SECONDS = 5
 
 class Heartbeats:
     def __init__(self) -> None:

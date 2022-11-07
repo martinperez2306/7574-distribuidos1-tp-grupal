@@ -1,6 +1,8 @@
+from ctypes import c_bool
 import logging
+from multiprocessing import Value
 from common.middleware import Middleware
-from watcher.src.heartbeats import SERVICE_TIMEOUT_SECONDS
+from src.heartbeats import SERVICE_TIMEOUT_SECONDS
 
 WATCHER_EXCHANGE = 'watcher_exchange'
 WATCHER_QUEUE = 'watcher_queue'
@@ -8,8 +10,7 @@ WATCHER_QUEUE = 'watcher_queue'
 class WatcherMiddlware(Middleware):
     def __init__(self, service_id) -> None:
         super().__init__()
-        self.running = False
-        self.stopped = False
+        self.running = Value(c_bool, False)
         self.queue = WATCHER_QUEUE + "_" + service_id
         self.channel.exchange_declare(exchange=WATCHER_EXCHANGE, exchange_type='fanout')
         self.channel.queue_declare(self.queue)
@@ -18,14 +19,13 @@ class WatcherMiddlware(Middleware):
         self.channel.basic_qos(prefetch_count=1)
 
     def run(self):
-        self.running = True
+        self.running.value = True
 
     def accept_heartbeats(self, callback):
         # Get ten messages and break out
         for method_frame, properties, body in self.channel.consume(queue=self.queue, inactivity_timeout=SERVICE_TIMEOUT_SECONDS):
-
-            if not self.running:
-                self.stopped = True
+            if not self.running.value:
+                logging.info("Breacking consume loop")
                 break
 
             heartbeat = None
@@ -43,15 +43,13 @@ class WatcherMiddlware(Middleware):
                 self.channel.basic_ack(method_frame.delivery_tag)
 
             callback(heartbeat)
-
-    def stop(self):
-        self.running = False
         # Cancel the consumer and return any pending messages
         requeued_messages = self.channel.cancel()
         logging.info('Requeued %i messages for Watcher Middleware' % requeued_messages)
-        #Loop to safe stop. It waits for consume's loop
-        while not self.stopped:
-            continue
         # Close the channel and the connection
         self.channel.close()
         self.connection.close()
+
+    def stop(self):
+        self.running.value = False
+        
