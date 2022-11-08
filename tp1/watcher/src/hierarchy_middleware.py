@@ -9,7 +9,7 @@ from src.election_state import NotParticipating, Participating
 
 MASTER_TIMEOUT = 5
 HEARBEAT_FRECUENCY = 1
-FIRST_INSTANCE = 1
+FIRST_INSTANCE = 0
 
 class HierarchyMiddlware(Middleware):
     def __init__(self, neighborhood, hierarchy_id, hierarchy_instances) -> None:

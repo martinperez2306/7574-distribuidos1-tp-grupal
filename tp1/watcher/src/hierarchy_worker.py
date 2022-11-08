@@ -8,7 +8,7 @@ class HierarchyWorker:
     def __init__(self) -> None:
         self.id = os.environ['HOSTNAME']
         self.hyerarchy_id = os.environ['INSTANCE_ID']
-        self.hyerarchy_instances = os.environ['TOTAL_INSTANCES']
+        self.hyerarchy_instances = os.environ['WATCHERS_INSTANCES']
         self.hierarchy_middleware = HierarchyMiddlware(WATCHER_GROUP, self.hyerarchy_id, self.hyerarchy_instances)
 
     def im_leader(self) -> bool:
