@@ -6,7 +6,7 @@ WATCHER_GROUP = "watcher"
 
 class HierarchyWorker:
     def __init__(self) -> None:
-        self.id = os.environ['HOSTNAME']
+        self.id = os.environ['SERVICE_ID']
         self.hyerarchy_id = os.environ['INSTANCE_ID']
         self.hyerarchy_instances = os.environ['WATCHERS_INSTANCES']
         self.hierarchy_middleware = HierarchyMiddlware(WATCHER_GROUP, self.hyerarchy_id, self.hyerarchy_instances)
