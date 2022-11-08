@@ -26,14 +26,14 @@ class HierarchyMiddlware(Middleware):
         self.queue = self.neighborhood + "_" + str(self.hyerarchy_id)
         self.neighbour_queue = self.neighborhood + "_" + str(self.neighbour_id)
         for slave_id in range(self.hyerarchy_instances):
-            queue = self.neighborhood + "_" + str(slave_id + FIRST_INSTANCE)
+            queue = self.neighborhood + "_" + str(slave_id)
             self.channel.queue_declare(queue)
         self.channel.basic_qos(prefetch_count=1)
 
     def _get_neighbour(self) -> int:
-        if self.hyerarchy_id == self.hyerarchy_instances:
+        if self.hyerarchy_id == (self.hyerarchy_instances - 1):
             return FIRST_INSTANCE
-        return (self.hyerarchy_id + FIRST_INSTANCE)
+        return (self.hyerarchy_id + 1)
 
     def run(self):
         logging.info("HierarchyMiddlware started")
@@ -49,9 +49,9 @@ class HierarchyMiddlware(Middleware):
             if self.im_leader():
                 logging.info("Sending heartbeat to all slaves")
                 for slave_id in range(self.hyerarchy_instances):
-                    if (slave_id + FIRST_INSTANCE) != self.hyerarchy_id:
+                    if (slave_id) != self.hyerarchy_id:
                         leader_message = Leader(self.hyerarchy_id).to_string()
-                        super().send_message(self.neighborhood + "_" + str(slave_id + FIRST_INSTANCE), leader_message)
+                        super().send_message(self.neighborhood + "_" + str(slave_id), leader_message)
             time.sleep(HEARBEAT_FRECUENCY)
             
     def im_leader(self) -> bool:

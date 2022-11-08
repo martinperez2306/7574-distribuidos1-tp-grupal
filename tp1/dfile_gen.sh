@@ -154,7 +154,7 @@ do
       - SERVICE_ID=dropper_${i}
       - LOGGING_LEVEL=INFO"
 
-  BASE+="${JOINER_INSTANCE}"
+  BASE+="${DROPPER_INSTANCE}"
 done
 
 for (( i = 0; i < $REPLICAS_LIKES_FILTER; i++ )) 

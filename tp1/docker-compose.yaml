@@ -126,31 +126,31 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=joiner_1
       - LOGGING_LEVEL=INFO
-  joiner_1:
-    container_name: joiner_1
+  dropper_0:
+    container_name: dropper_0
     build:
       context: ./
-      dockerfile: ./joiner/Dockerfile
+      dockerfile: ./dropper/Dockerfile
     entrypoint: python3 main.py
     depends_on:
       rabbitmq:
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=joiner_1
+      - SERVICE_ID=dropper_0
       - LOGGING_LEVEL=INFO
-  joiner_1:
-    container_name: joiner_1
+  dropper_1:
+    container_name: dropper_1
     build:
       context: ./
-      dockerfile: ./joiner/Dockerfile
+      dockerfile: ./dropper/Dockerfile
     entrypoint: python3 main.py
     depends_on:
       rabbitmq:
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=joiner_1
+      - SERVICE_ID=dropper_1
       - LOGGING_LEVEL=INFO
   like_filter_0:
     container_name: like_filter_0
