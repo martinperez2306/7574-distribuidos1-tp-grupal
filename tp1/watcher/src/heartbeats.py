@@ -2,8 +2,7 @@ from datetime import datetime
 import logging
 import os
 
-SERVICE_TIMEOUT_SECONDS = 5
-NO_HEARTBEAT_CODE = -1
+from common.constants import NO_HEARTBEAT_CODE, SERVICE_HEARTBEAT_TIMEOUT
 
 class Heartbeats:
     def __init__(self) -> None:
@@ -28,14 +27,14 @@ class Heartbeats:
     def _init_service_hearbeats(self, service_name, service_instances):
         for i in range(service_instances):
             service_id = service_name + "_" + str(i)
-            self.hearbeats[service_id] = NO_HEARTBEAT_CODE
+            self.hearbeat(service_id)
 
     def get_unavailable_services(self) -> list:
         unavailable_services = list()
         for service_id in self.hearbeats:
             current_timestamp = self._get_current_timestamp()
             service_last_timestamp = self.hearbeats.get(service_id)
-            timeout_timestamp = SERVICE_TIMEOUT_SECONDS + service_last_timestamp
+            timeout_timestamp = SERVICE_HEARTBEAT_TIMEOUT + service_last_timestamp
             logging.debug("Current Timestamp [{}]. Service Timeout Timestamp [{}]".format(current_timestamp, timeout_timestamp))
             if current_timestamp > timeout_timestamp:
                 logging.info("Service [{}] is unavailable".format(service_id))

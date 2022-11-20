@@ -2,10 +2,6 @@ import logging
 from common.middleware import Middleware
 
 WATCHER_EXCHANGE = 'watcher_exchange'
-HEARTBEAT_FRECUENCY = 1  # In seconds
-
-logging.getLogger("pika").propagate = False
-
 
 class HeartbeatMiddleware(Middleware):
     def __init__(self, heartbeat_id) -> None:

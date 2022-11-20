@@ -1,18 +1,4 @@
-#!/bin/bash
-set -e
 
-# Vars 
-REPLICAS_JOINER="${1:-1}"
-REPLICAS_DROPPER="${2:-1}"
-REPLICAS_TRENDING="${3:-1}"
-REPLICAS_THUMBNAIL="${4:-1}"
-REPLICAS_LIKES_FILTER="${5:-1}"
-REPLICAS_WATCHERS="${6:-1}"
-FILE_NAME="docker-compose.yaml"
-
-FILTER_QTY="5000000"
-
-BASE="
 version: '3'
 services:
   rabbitmq:
@@ -71,7 +57,7 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=trending_router
       - LOGGING_LEVEL=INFO
-      - TRENDING_INSTANCES=${REPLICAS_TRENDING}
+      - TRENDING_INSTANCES=1
   thumbnail_router:
     container_name: thumbnail_router
     build:
@@ -85,7 +71,7 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=thumbnail_router
       - LOGGING_LEVEL=INFO
-      - INSTANCES=${REPLICAS_THUMBNAIL}
+      - INSTANCES=1
   trending_top:
     container_name: trending_top
     build:
@@ -99,7 +85,7 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=trending_top
       - LOGGING_LEVEL=INFO
-      - TRENDING_INSTANCES=${REPLICAS_TRENDING}
+      - TRENDING_INSTANCES=1
   downloader:
     container_name: downloader
     build:
@@ -113,14 +99,9 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=downloader
       - LOGGING_LEVEL=INFO
-      - THUMBNAIL_INSTANCES=${REPLICAS_THUMBNAIL}"
-
-for (( i = 0; i < $REPLICAS_JOINER; i++ )) 
-do
-  
-  JOINER_INSTANCE="
-  joiner_${i}:
-    container_name: joiner_${i}
+      - THUMBNAIL_INSTANCES=1
+  joiner_0:
+    container_name: joiner_0
     build:
       context: ./
       dockerfile: ./joiner/Dockerfile
@@ -130,18 +111,10 @@ do
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=joiner_${i}
-      - LOGGING_LEVEL=INFO"
-
-  BASE+="${JOINER_INSTANCE}"
-done
-
-for (( i = 0; i < $REPLICAS_DROPPER; i++ )) 
-do
-  
-  DROPPER_INSTANCE="
-  dropper_${i}:
-    container_name: dropper_${i}
+      - SERVICE_ID=joiner_0
+      - LOGGING_LEVEL=INFO
+  dropper_0:
+    container_name: dropper_0
     build:
       context: ./
       dockerfile: ./dropper/Dockerfile
@@ -151,18 +124,10 @@ do
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=dropper_${i}
-      - LOGGING_LEVEL=INFO"
-
-  BASE+="${DROPPER_INSTANCE}"
-done
-
-for (( i = 0; i < $REPLICAS_LIKES_FILTER; i++ )) 
-do
-  
-  LIKE_FILTER_INSTANCE="
-  like_filter_${i}:
-    container_name: like_filter_${i}
+      - SERVICE_ID=dropper_0
+      - LOGGING_LEVEL=INFO
+  like_filter_0:
+    container_name: like_filter_0
     build:
       context: ./
       dockerfile: ./likes_filter/Dockerfile
@@ -173,18 +138,10 @@ do
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - LOGGING_LEVEL=INFO
-      - SERVICE_ID=like_filter_${i}
-      - FILTER_QTY=${FILTER_QTY}"
-
-  BASE+="${LIKE_FILTER_INSTANCE}"
-done
-      
-for (( i = 0; i < $REPLICAS_TRENDING; i++ )) 
-do
-  
-  TRENDING_INSTANCE="
-  trending_${i}:
-    container_name: trending_${i}
+      - SERVICE_ID=like_filter_0
+      - FILTER_QTY=5000000
+  trending_0:
+    container_name: trending_0
     build:
       context: ./
       dockerfile: ./trending_instance/Dockerfile
@@ -194,19 +151,11 @@ do
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=trending_${i}
+      - SERVICE_ID=trending_0
       - LOGGING_LEVEL=INFO
-      - INSTANCE_NR=${i}"
-
-  BASE+="${TRENDING_INSTANCE}"
-done
-
-for (( i = 0; i < $REPLICAS_THUMBNAIL; i++ )) 
-do
-  
-  THUMBNAIL_INSTANCE="
-  thumbnail_${i}:
-    container_name: thumbnail_${i}
+      - INSTANCE_NR=0
+  thumbnail_0:
+    container_name: thumbnail_0
     build:
       context: ./
       dockerfile: ./thumbnail_instance/Dockerfile
@@ -216,19 +165,11 @@ do
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=thumbnail_${i}
+      - SERVICE_ID=thumbnail_0
       - LOGGING_LEVEL=INFO
-      - INSTANCE_NR=${i}"
-
-  BASE+="${THUMBNAIL_INSTANCE}"
-done
-
-for (( i = 0; i < $REPLICAS_WATCHERS; i++ )) 
-do
-  
-  WATCHER_INSTANCE="
-  watcher_${i}:
-    container_name: watcher_${i}
+      - INSTANCE_NR=0
+  watcher_0:
+    container_name: watcher_0
     build:
       context: ./
       dockerfile: ./watcher/Dockerfile
@@ -238,20 +179,61 @@ do
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=watcher_${i}
+      - SERVICE_ID=watcher_0
       - SERVICE_PORT=8080
       - LOGGING_LEVEL=INFO
-      - INSTANCE_ID=${i}
-      - JOINER_INSTANCES=$REPLICAS_JOINER
-      - DROPPER_INSTANCES=$REPLICAS_DROPPER
-      - TRENDING_INSTANCES=$REPLICAS_TRENDING
-      - LIKE_FILTER_INSTANCES=$REPLICAS_LIKES_FILTER
-      - THUMBNAIL_INSTANCES=$REPLICAS_THUMBNAIL
-      - WATCHERS_INSTANCES=$REPLICAS_WATCHERS
+      - INSTANCE_ID=0
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
+      - LIKE_FILTER_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
+      - WATCHERS_INSTANCES=3
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock"
-
-  BASE+="${WATCHER_INSTANCE}"
-done
-
-echo "${BASE}" > ${FILE_NAME}
+      - /var/run/docker.sock:/var/run/docker.sock
+  watcher_1:
+    container_name: watcher_1
+    build:
+      context: ./
+      dockerfile: ./watcher/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=watcher_1
+      - SERVICE_PORT=8080
+      - LOGGING_LEVEL=INFO
+      - INSTANCE_ID=1
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
+      - LIKE_FILTER_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
+      - WATCHERS_INSTANCES=3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  watcher_2:
+    container_name: watcher_2
+    build:
+      context: ./
+      dockerfile: ./watcher/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=watcher_2
+      - SERVICE_PORT=8080
+      - LOGGING_LEVEL=INFO
+      - INSTANCE_ID=2
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
+      - LIKE_FILTER_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
+      - WATCHERS_INSTANCES=3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

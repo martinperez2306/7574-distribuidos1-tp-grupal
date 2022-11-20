@@ -1,6 +1,6 @@
 import logging
 from common.middleware import Middleware
-from src.heartbeats import SERVICE_TIMEOUT_SECONDS
+from src.heartbeats import SERVICE_HEARTBEAT_TIMEOUT
 
 WATCHER_EXCHANGE = 'watcher_exchange'
 WATCHER_QUEUE = 'watcher_queue'
@@ -21,7 +21,7 @@ class WatcherMiddlware(Middleware):
 
     def accept_heartbeats(self, callback):
         # Get ten messages and break out
-        for method_frame, properties, body in self.channel.consume(queue=self.queue, inactivity_timeout=SERVICE_TIMEOUT_SECONDS):
+        for method_frame, properties, body in self.channel.consume(queue=self.queue, inactivity_timeout=SERVICE_HEARTBEAT_TIMEOUT):
             if not self.running:
                 logging.info("Breacking consume loop")
                 break
@@ -35,19 +35,20 @@ class WatcherMiddlware(Middleware):
                 # Display the message parts
                 logging.debug("Method Frame [{}]".format(method_frame))
                 logging.debug("Properties [{}]".format(properties))
-                logging.debug("Message [{}]".format(body))
+                logging.debug("Message Body [{}]".format(body))
                 heartbeat = body.decode()
                 # Acknowledge the message
                 self.channel.basic_ack(method_frame.delivery_tag)
 
             callback(heartbeat)
-        # Cancel the consumer and return any pending messages
-        requeued_messages = self.channel.cancel()
-        logging.info('Requeued %i messages for Watcher Middleware' % requeued_messages)
         # Close the channel and the connection
         self.channel.close()
-        self.connection.close()
+        super().close_connection()
 
     def stop(self):
         self.running = False
+        # Cancel the consumer and return any pending messages
+        requeued_messages = self.channel.cancel()
+        logging.info('Requeued %i messages for Watcher Middleware' % requeued_messages)
+        logging.info('WatcherMiddlware stopped')
         

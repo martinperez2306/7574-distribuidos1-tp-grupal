@@ -4,14 +4,13 @@ import docker
 
 from src.heartbeats import Heartbeats
 from src.middleware import WatcherMiddlware
-from src.hierarchy_worker import HierarchyWorker
+from src.bully_tcp_worker import BullyTCPWorker
 
-WATCHER_QUEUE = "watcher_queue"
-WATCHER_HIERARCHY_QUEUE = "watcher_hierarchy_queue"
+WATCHER_GROUP = "watcher"
 
-class Watcher(HierarchyWorker):
+class Watcher(BullyTCPWorker):
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__(WATCHER_GROUP)
         self.heartbeats = Heartbeats()
         self.docker = docker.from_env()
         signal.signal(signal.SIGTERM, self.exit_gracefully)
@@ -19,7 +18,12 @@ class Watcher(HierarchyWorker):
         self.watcher_middleware = WatcherMiddlware(self.id)
 
     def start(self):
-        logging.info('Starting Watcher')
+        """Watcher.start()
+            Starts watchers processes
+            - BullyTCPWorker process (Background process)
+            - Heartbeat process (Main process)
+        """
+        logging.info('Watcher started')
         self.heartbeats.init_hearbeats()
         super().start()
         self.watcher_middleware.run()
@@ -34,7 +38,7 @@ class Watcher(HierarchyWorker):
     def wake_up_services(self, unavailable_services: list):
         if self.im_leader():
             for service in unavailable_services:
-                logging.debug("Starting unavailable service [{}]".format(service))
+                logging.info("Starting unavailable service [{}]".format(service))
                 self.wake_up(service)
 
     def wake_up(self, service):
@@ -49,3 +53,4 @@ class Watcher(HierarchyWorker):
         logging.info('Exiting gracefully')
         super().stop()
         self.watcher_middleware.stop()
+        logging.info('Watcher stopped')
