@@ -205,4 +205,4 @@ class BullyTCPWorker:
         self.start_bully_process.join()
         self.check_process.join()
         self.middleware_process.join()
-        logging.info('BullyTCPWorker Stopped')
+        logging.info('BullyTCPWorker stopped')

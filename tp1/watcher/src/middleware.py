@@ -41,13 +41,14 @@ class WatcherMiddlware(Middleware):
                 self.channel.basic_ack(method_frame.delivery_tag)
 
             callback(heartbeat)
-        # Cancel the consumer and return any pending messages
-        requeued_messages = self.channel.cancel()
-        logging.info('Requeued %i messages for Watcher Middleware' % requeued_messages)
         # Close the channel and the connection
         self.channel.close()
-        self.connection.close()
+        super().close_connection()
 
     def stop(self):
         self.running = False
+        # Cancel the consumer and return any pending messages
+        requeued_messages = self.channel.cancel()
+        logging.info('Requeued %i messages for Watcher Middleware' % requeued_messages)
+        logging.info('WatcherMiddlware stopped')
         

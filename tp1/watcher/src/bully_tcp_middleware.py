@@ -118,4 +118,4 @@ class BullyTCPMiddleware(object):
 
     def finalize(self):
         self.server_socket.close()
-        logging.info('BullyTCPMiddlware Stopped')
+        logging.info('BullyTCPMiddlware finalized')
