@@ -77,7 +77,7 @@ class BullyTCPMiddleware(object):
         sends_sucessfully = False
         host = self.work_group + "_" + str(instance_id)
         port = self.port
-        logging.info("Sending [{}] to Host [{}] and Port [{}]".format(message, host, port))
+        logging.debug("Sending [{}] to Host [{}] and Port [{}]".format(message, host, port))
         try:
             with socket.create_connection((host, port)) as connection:
                 connection.sendall(message.encode(ENCODING))

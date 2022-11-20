@@ -93,7 +93,7 @@ class BullyTCPWorker:
             time.sleep(CHECK_FRECUENCY)
 
     def _check_slaves_alive(self):
-        logging.info("Checking slaves alives")
+        logging.debug("Checking slaves alives")
         for instance_id in range(self.bully_instances):
             if instance_id != self.bully_id:
                 checking_tries = 0
@@ -113,7 +113,7 @@ class BullyTCPWorker:
         """Check Leader Alive\n
             Here `bully middleware` copy is responsible to check alives start new election if leader is not responding.
         """
-        logging.info("Checking leader alives")
+        logging.debug("Checking leader alives")
         checking_tries = 0
         message = AliveMessage(self.bully_id).to_string()
         while checking_tries < CHECK_RETRIES:
@@ -160,35 +160,35 @@ class BullyTCPWorker:
            This method handle message from connection and returns boolean representation of handle.
            If handle successfully returns True otherwise returns False.
         """
-        logging.info('Handling Message [{}]'.format(message))
+        logging.debug('Handling Message [{}]'.format(message))
         election = ElectionMessage.of(message)
         if TimeoutMessage.is_election(election):
-            logging.info("Timeout message!")
+            logging.debug("Timeout message!")
             return False
         elif ErrorMessage.is_election(election):
-            logging.info("Error message!")
+            logging.debug("Error message!")
             return False
         elif AliveMessage.is_election(election):
             alive_answer_message = AliveAnswerMessage(self.bully_id).to_string()
-            logging.info("Responding alive message")
+            logging.debug("Responding alive message")
             self.bully_middleware.send_to_connection(alive_answer_message, connection)
         elif LeaderElectionMessage.is_election(election):
-            logging.info("Leader election in progress")
+            logging.debug("Leader election in progress")
             self.leader.value = NO_LEADER
             election_answer_message = ElectionAnswerMessage(self.bully_id).to_string()
             self.bully_middleware.send_to_connection(election_answer_message, connection)
             self._start_election()
         elif AliveAnswerMessage.is_election(election):
             if self.im_leader():
-                logging.info("Slave is alive")
+                logging.debug("Slave is alive")
             else:
-                logging.info("Leader is alive")
+                logging.debug("Leader is alive")
         elif ElectionAnswerMessage.is_election(election):
-            logging.info("Election answer message receive")
+            logging.debug("Election answer message receive")
         elif CoordinatorMessage.is_election(election):
             self.leader.value = election.id
             if self.im_leader():
-                logging.info("Coordination message answer message receive")
+                logging.debug("Coordination message answer message receive")
             else:
                 logging.info("New Leader was selected [{}]".format(election.id))
                 self.bully_middleware.send_to_connection(message, connection)
