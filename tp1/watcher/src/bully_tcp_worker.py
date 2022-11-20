@@ -62,10 +62,10 @@ class BullyTCPWorker:
             Starts Bully Middleware process and waits for Bully worker stop.\n
             This process has `bully_middleware` copy responsable to accept conections and handle messages.
         """
-        self.bully_middleware.run(self._handle_message)
+        self.bully_middleware.initialize()
         while self.running.value:
-            continue
-        self.bully_middleware.stop()
+            self.bully_middleware.accept_connection(self._handle_message)
+        self.bully_middleware.finalize()
 
     def _start_bully(self):
         """Start Bully\n

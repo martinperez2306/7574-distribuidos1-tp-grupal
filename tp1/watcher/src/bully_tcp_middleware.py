@@ -1,11 +1,10 @@
 import logging
 import socket
-from ctypes import c_bool
-from multiprocessing import Process, Value
 from src.election_message import ELECTION_LENGTH_MESSAGE, ErrorMessage, TimeoutMessage
 
 BUFFER_SIZE = 1024
 ENCODING = "utf-8"
+LISTENING_TIMEOUT = 1.0
 
 class BullyTCPMiddleware(object):
     """BullyTCPMiddlware
@@ -24,30 +23,24 @@ class BullyTCPMiddleware(object):
         self.bully_instances = int(bully_instances)
         self.work_group = work_group
         self.server_socket = None
-        self.server_process = None
-        ####CRITIC SECTION####
-        self.running = Value(c_bool, False)
-        ######################
     
-    def run(self, callback):
-        logging.info("BullyTCPMiddlware started")
-        self.running.value = True
+    def initialize(self):
+        logging.info("BullyTCPMiddlware initialized")
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind(('', self.port))
         self.server_socket.listen(self.bully_instances)
-        self.server_process = Process(target=self._accept_connections, args=(self.server_socket, callback))
-        self.server_process.start()
 
-    def _accept_connections(self, socket: socket.socket, callback):
+    def accept_connection(self, callback):
         logging.debug("Accept connections in port [{}]".format(self.port))
-        while self.running.value:
-            try:
-                connection, _addr = socket.accept()
-                self._handle_connection(connection, callback)
-            except OSError as error:
-                logging.error("Error while accept connection in server socket {}. Error: {}".format(self.server_socket, error))
-                socket.close()
-                break
+        self.server_socket.settimeout(LISTENING_TIMEOUT)
+        try:
+            connection, _addr = self.server_socket.accept()
+            self._handle_connection(connection, callback)
+        except socket.timeout as timeout:
+            pass #Timeout await connections is expected
+        except socket.error as error:
+            logging.error("Error while accept connection in server socket {}. Error: {}".format(self.server_socket, error))
+            self.server_socket.close()
             
     def _handle_connection(self, connection: socket.socket, callback):
         logging.debug("Handling connection [{}]".format(connection))
@@ -123,8 +116,6 @@ class BullyTCPMiddleware(object):
         connection.settimeout(None)
         return data.decode(ENCODING)
 
-    def stop(self):
-        self.running.value = False
+    def finalize(self):
         self.server_socket.close()
-        self.server_process.join()
         logging.info('BullyTCPMiddlware Stopped')
