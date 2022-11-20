@@ -12,10 +12,10 @@ from src.election_message import AliveAnswerMessage, AliveMessage, CoordinatorMe
 NO_LEADER = -1
 CHECK_RETRIES = 3
 
-LEADER_TIMEOUT = 10 #In seconds
-SLAVES_TIMEOUT = 10 #In seconds
-ELECTION_TIMEOUT = 10 #In seconds
-CHECK_FRECUENCY = 5 #In seconds
+LEADER_TIMEOUT = 5 #In seconds
+SLAVES_TIMEOUT = 5 #In seconds
+ELECTION_TIMEOUT = 5 #In seconds
+CHECK_FRECUENCY = 2 #In seconds
 
 class BullyTCPWorker:
     """BullyTCPWorker\n
