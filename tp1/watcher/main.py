@@ -14,7 +14,7 @@ def main():
     
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
-    logging.info("Watcher configuration: {}".format(config_params))
+    logging.debug("Watcher configuration: {}".format(config_params))
     logging.info("Watcher starting work")
     logging.getLogger("pika").setLevel(logging.ERROR)
 
