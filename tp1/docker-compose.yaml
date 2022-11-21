@@ -14,8 +14,8 @@ services:
       retries: 5
     logging:
       driver: none
-  client:
-    container_name: client
+  client_0:
+    container_name: client_0
     build:
       context: ./
       dockerfile: ./client/Dockerfile
@@ -29,21 +29,8 @@ services:
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
     volumes:
-      - ./raw_data:/workspace/data
-      - ./.temp:/workspace/.temp
-  tag_unique:
-    container_name: tag_unique
-    build:
-      context: ./
-      dockerfile: ./tag_unique/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=tag_unique
-      - LOGGING_LEVEL=INFO
+      - ./data/client0:/workspace/data
+      - ./.temp0:/workspace/.temp
   trending_router:
     container_name: trending_router
     build:
@@ -72,20 +59,6 @@ services:
       - SERVICE_ID=thumbnail_router
       - LOGGING_LEVEL=INFO
       - INSTANCES=1
-  trending_top:
-    container_name: trending_top
-    build:
-      context: ./
-      dockerfile: ./trending_top/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=trending_top
-      - LOGGING_LEVEL=INFO
-      - TRENDING_INSTANCES=1
   downloader:
     container_name: downloader
     build:
@@ -100,6 +73,33 @@ services:
       - SERVICE_ID=downloader
       - LOGGING_LEVEL=INFO
       - THUMBNAIL_INSTANCES=1
+  tag_unique:
+    container_name: tag_unique
+    build:
+      context: ./
+      dockerfile: ./tag_unique/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=tag_unique
+      - LOGGING_LEVEL=INFO
+  trending_top:
+    container_name: trending_top
+    build:
+      context: ./
+      dockerfile: ./trending_top/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=trending_top
+      - LOGGING_LEVEL=INFO
+      - TRENDING_INSTANCES=1
   joiner_0:
     container_name: joiner_0
     build:
@@ -191,6 +191,7 @@ services:
       - WATCHERS_INSTANCES=3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config
   watcher_1:
     container_name: watcher_1
     build:
@@ -214,6 +215,7 @@ services:
       - WATCHERS_INSTANCES=3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config
   watcher_2:
     container_name: watcher_2
     build:
@@ -237,3 +239,4 @@ services:
       - WATCHERS_INSTANCES=3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config

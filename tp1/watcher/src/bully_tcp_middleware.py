@@ -4,7 +4,6 @@ from src.election_message import ELECTION_LENGTH_MESSAGE, ErrorMessage, TimeoutM
 
 BUFFER_SIZE = 1024
 ENCODING = "utf-8"
-LISTENING_TIMEOUT = 1.0
 
 class BullyTCPMiddleware(object):
     """BullyTCPMiddlware
@@ -14,13 +13,14 @@ class BullyTCPMiddleware(object):
         * Slave - Slave
     """
 
-    def __init__(self, port, bully_id, bully_instances, work_group) -> None:
+    def __init__(self, config_params, work_group) -> None:
         """
         Creates a new istance of BullyTCPMiddlware
         """
-        self.port = int(port)
-        self.bully_id = int(bully_id)
-        self.bully_instances = int(bully_instances)
+        self.port = int(config_params['service_port'])
+        self.bully_id = int(config_params['instance_id'])
+        self.bully_instances = int(config_params['watchers_instances'])
+        self.listening_timeout = float(config_params['bully_listening_timeout'])
         self.work_group = work_group
         self.server_socket = None
     
@@ -32,7 +32,7 @@ class BullyTCPMiddleware(object):
 
     def accept_connection(self, callback):
         logging.debug("Accept connections in port [{}]".format(self.port))
-        self.server_socket.settimeout(LISTENING_TIMEOUT)
+        self.server_socket.settimeout(self.listening_timeout)
         try:
             connection, _addr = self.server_socket.accept()
             self._handle_connection(connection, callback)
@@ -48,19 +48,19 @@ class BullyTCPMiddleware(object):
         message = self._recv(connection, expected_length_message)
         callback(connection, message)
 
-    def send_to_infs(self, message: str, timeout: int, callback) -> list['bool']:
+    def send_to_infs(self, message: str, timeout: float, callback) -> list['bool']:
         instances = range(self.bully_id)
         return self._send_to(message, instances, timeout, callback)
 
-    def send_to_sups(self, message: str, timeout: int, callback) -> list['bool']:
+    def send_to_sups(self, message: str, timeout: float, callback) -> list['bool']:
         instances = range(self.bully_id, self.bully_instances)
         return self._send_to(message, instances, timeout, callback)
 
-    def send_to_all(self, message: str, timeout: int, callback) -> list['bool']:
+    def send_to_all(self, message: str, timeout: float, callback) -> list['bool']:
         instances = range(self.bully_instances)
         return self._send_to(message, instances, timeout, callback)
     
-    def _send_to(self, message: str, instances: list['int'], timeout, callback) -> list['bool']:
+    def _send_to(self, message: str, instances: list['int'], timeout: float, callback) -> list['bool']:
         sends_sucessfully = list()
         for instance_id in instances:
             if instance_id != self.bully_id:
@@ -68,7 +68,7 @@ class BullyTCPMiddleware(object):
                 sends_sucessfully.append(send_sucessfully)
         return sends_sucessfully
 
-    def send(self, message: str, instance_id: int, timeout: int, callback) -> bool:
+    def send(self, message: str, instance_id: int, timeout: float, callback) -> bool:
         """Send
            Send message to a instance.
            If a `timeout` is specified, it waits to receive a response in that period of time.
