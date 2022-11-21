@@ -249,7 +249,8 @@ do
       - THUMBNAIL_INSTANCES=$REPLICAS_THUMBNAIL
       - WATCHERS_INSTANCES=$REPLICAS_WATCHERS
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config"
 
   BASE+="${WATCHER_INSTANCE}"
 done

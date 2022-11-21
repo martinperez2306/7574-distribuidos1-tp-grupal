@@ -191,6 +191,7 @@ services:
       - WATCHERS_INSTANCES=3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config
   watcher_1:
     container_name: watcher_1
     build:
@@ -214,6 +215,7 @@ services:
       - WATCHERS_INSTANCES=3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config
   watcher_2:
     container_name: watcher_2
     build:
@@ -237,3 +239,4 @@ services:
       - WATCHERS_INSTANCES=3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config
