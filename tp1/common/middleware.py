@@ -27,8 +27,16 @@ class Middleware():
     def stop_recv_message(self, consumer_tag):
         self.channel.basic_cancel(consumer_tag=consumer_tag)
 
-    def recv_message(self, queue, callback, autoack):
-        return self.channel.basic_consume(queue, callback, auto_ack=autoack)
+    def recv_message(self, queue, callback):
+        return self.channel.basic_consume(queue, lambda ch, method,
+                                                properties, body: self.callback_with_ack(callback, ch, method, properties, body.decode()), auto_ack=False)
 
     def close_connection(self):
         self.connection.close()
+
+    def consume(self):
+        self.channel.start_consuming()
+
+    def callback_with_ack(self, callback, ch, method, properties, body):
+        callback(body)
+        ch.basic_ack(delivery_tag=method.delivery_tag)

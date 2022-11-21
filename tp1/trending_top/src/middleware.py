@@ -14,8 +14,7 @@ class TrendingTopMiddleware(Middleware):
 
     def recv_result_message(self, callback):
 
-        self.vid_msg_tag = super().recv_message(TRENDING_TOP_QUEUE, lambda ch, method,
-                                                properties, body: callback(body.decode()), True)
+        self.vid_msg_tag = super().recv_message(TRENDING_TOP_QUEUE, callback)
         self.channel.start_consuming()
 
     def send_result_message(self, message):

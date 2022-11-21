@@ -22,8 +22,7 @@ class TrendingInstanceMiddlware(Middleware):
 
     def recv_video_message(self, callback):
 
-        self.vid_msg_tag = super().recv_message(self.input_queue_name, lambda ch, method,
-                                                properties, body: callback(body.decode()), True)
+        self.vid_msg_tag = super().recv_message(self.input_queue_name, callback)
         self.channel.start_consuming()
 
     def send_result_message(self, message):
