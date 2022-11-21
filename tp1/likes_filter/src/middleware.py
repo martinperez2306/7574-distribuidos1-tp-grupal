@@ -25,13 +25,10 @@ class LikesFilterMiddlware(Middleware):
 
     def recv_video_message(self, callback):
 
-        self.vid_msg_tag = super().recv_message(LIKES_QUEUE, lambda ch, method,
-                                                properties, body: self.callback_with_ack(callback, ch, method, properties, body.decode()), False)
+        self.vid_msg_tag = super().recv_message(LIKES_QUEUE, callback)
         self.channel.start_consuming()
 
     def send_video_message(self, message):
         super().send_to_exchange(FILTERED_LIKES_EXCHANGE, '', message)
 
-    def callback_with_ack(self, callback, ch, method, properties, body):
-        callback(body)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+    

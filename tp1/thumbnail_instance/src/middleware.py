@@ -31,8 +31,7 @@ class ThumbnailInstanceMiddlware(Middleware):
         self.channel.queue_bind(
             exchange=CATEGORIES_COUNT_EXCHANGE, queue=category_count.method.queue, routing_key='')
 
-        self.cat_count_tag = super().recv_message(category_count.method.queue, lambda ch, method,
-                                                  properties, body: callback(body.decode()), True)
+        self.cat_count_tag = super().recv_message(category_count.method.queue, callback)
         self.channel.start_consuming()
 
     def stop_recv_category_count(self):
@@ -40,8 +39,7 @@ class ThumbnailInstanceMiddlware(Middleware):
 
     def recv_video_message(self, callback):
 
-        self.vid_msg_tag = super().recv_message(self.input_queue_name, lambda ch, method,
-                                                properties, body: callback(body.decode()), True)
+        self.vid_msg_tag = super().recv_message(self.input_queue_name, callback)
 
         self.channel.start_consuming()
 
