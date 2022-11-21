@@ -16,6 +16,8 @@ RESULT_1 = '1'
 RESULT_2 = '2'
 RESULT_3 = '3'
 
+MESSAGE_HANDSHAKE = 'H'
+
 '''
     Returns the first element that matches the separator and the rest of the buffer
 '''
@@ -48,6 +50,19 @@ class BaseMessage:
 
         return BaseMessage(code, client_id, message_id), buffer
 
+class MessageHandshake(BaseMessage):
+    def __init__(self, client_id) -> None:
+        super().__init__(MESSAGE_HANDSHAKE, client_id)
+
+    @staticmethod
+    def is_message(buffer) -> bool:
+        return buffer[0] == MESSAGE_HANDSHAKE
+
+    @classmethod
+    def decode(cls, buffer):
+        base, buffer = super().decode(buffer)
+
+        return MessageHandshake(base.client_id)
 
 class MessageEnd(BaseMessage):
     def __init__(self, client_id, message_id) -> None:
