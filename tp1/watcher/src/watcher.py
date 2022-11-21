@@ -10,7 +10,7 @@ WATCHER_GROUP = "watcher"
 
 class Watcher(BullyTCPWorker):
     def __init__(self, config_params) -> None:
-        super().__init__(WATCHER_GROUP)
+        super().__init__(config_params, WATCHER_GROUP)
         self.heartbeats = Heartbeats(config_params)
         self.docker = docker.from_env()
         signal.signal(signal.SIGTERM, self.exit_gracefully)

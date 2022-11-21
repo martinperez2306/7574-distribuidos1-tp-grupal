@@ -20,11 +20,11 @@ class BullyTCPWorker:
         self.id = config_params['service_id']
         self.bully_id = int(config_params['instance_id'])
         self.bully_instances = int(config_params['watchers_instances'])
-        self.check_retries = int(config_params['check_retries'])
-        self.check_frecuency = int(config_params['check_frecuency'])
-        self.leader_timeout = int(config_params['leader_timeout'])
-        self.slave_timeout = int(config_params['slave_timeout'])
-        self.election_timeout = int(config_params['election_timeout'])
+        self.check_retries = int(config_params['bully_check_retries'])
+        self.check_frecuency = int(config_params['bully_check_frecuency'])
+        self.leader_timeout = int(config_params['bully_leader_timeout'])
+        self.slave_timeout = int(config_params['bully_slave_timeout'])
+        self.election_timeout = int(config_params['bully_election_timeout'])
         self.work_group = work_group
         self.bully_middleware = BullyTCPMiddleware(config_params, self.work_group)
         self.middleware_process: Process = None

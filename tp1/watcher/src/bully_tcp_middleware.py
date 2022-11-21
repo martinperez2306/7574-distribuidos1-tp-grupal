@@ -4,7 +4,6 @@ from src.election_message import ELECTION_LENGTH_MESSAGE, ErrorMessage, TimeoutM
 
 BUFFER_SIZE = 1024
 ENCODING = "utf-8"
-LISTENING_TIMEOUT = 1.0
 
 class BullyTCPMiddleware(object):
     """BullyTCPMiddlware
@@ -21,6 +20,7 @@ class BullyTCPMiddleware(object):
         self.port = int(config_params['service_port'])
         self.bully_id = int(config_params['instance_id'])
         self.bully_instances = int(config_params['watchers_instances'])
+        self.listening_timeout = int(config_params['bully_listening_timeout'])
         self.work_group = work_group
         self.server_socket = None
     
@@ -32,7 +32,7 @@ class BullyTCPMiddleware(object):
 
     def accept_connection(self, callback):
         logging.debug("Accept connections in port [{}]".format(self.port))
-        self.server_socket.settimeout(LISTENING_TIMEOUT)
+        self.server_socket.settimeout(self.listening_timeout)
         try:
             connection, _addr = self.server_socket.accept()
             self._handle_connection(connection, callback)
