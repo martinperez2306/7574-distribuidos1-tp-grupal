@@ -1,5 +1,3 @@
-
-import os
 import time
 import docker
 import logging
@@ -10,12 +8,6 @@ from src.bully_tcp_middleware import BullyTCPMiddleware
 from src.election_message import AliveAnswerMessage, AliveMessage, CoordinatorMessage, ElectionAnswerMessage, ElectionMessage, ErrorMessage, LeaderElectionMessage, TimeoutMessage
 
 NO_LEADER = -1
-CHECK_RETRIES = 3
-
-LEADER_TIMEOUT = 5 #In seconds
-SLAVES_TIMEOUT = 5 #In seconds
-ELECTION_TIMEOUT = 5 #In seconds
-CHECK_FRECUENCY = 2 #In seconds
 
 class BullyTCPWorker:
     """BullyTCPWorker\n
@@ -24,13 +16,17 @@ class BullyTCPWorker:
     The Slaves are replicated workers to ensure the availability of the task to be executed.\n
     Implements Bully algorithm leader election.
     """
-    def __init__(self, work_group) -> None:
-        self.id = os.environ['SERVICE_ID']
-        self.port = int(os.environ['SERVICE_PORT'])
-        self.bully_id = int(os.environ['INSTANCE_ID'])
-        self.bully_instances = int(os.environ['WATCHERS_INSTANCES'])
+    def __init__(self, config_params, work_group) -> None:
+        self.id = config_params['service_id']
+        self.bully_id = int(config_params['instance_id'])
+        self.bully_instances = int(config_params['watchers_instances'])
+        self.check_retries = int(config_params['check_retries'])
+        self.check_frecuency = int(config_params['check_frecuency'])
+        self.leader_timeout = int(config_params['leader_timeout'])
+        self.slave_timeout = int(config_params['slave_timeout'])
+        self.election_timeout = int(config_params['election_timeout'])
         self.work_group = work_group
-        self.bully_middleware = BullyTCPMiddleware(self.port, self.bully_id, self.bully_instances, self.work_group)
+        self.bully_middleware = BullyTCPMiddleware(config_params, self.work_group)
         self.middleware_process: Process = None
         self.start_bully_process: Process = None
         self.check_process: Process = None
@@ -90,7 +86,7 @@ class BullyTCPWorker:
                 self._check_slaves_alive()
             elif (self.leader.value != NO_LEADER) and not self.im_leader():
                 self._check_leader_alive()
-            time.sleep(CHECK_FRECUENCY)
+            time.sleep(self.check_frecuency)
 
     def _check_slaves_alive(self):
         logging.debug("Checking slaves alives")
@@ -98,14 +94,14 @@ class BullyTCPWorker:
             if instance_id != self.bully_id:
                 checking_tries = 0
                 message = AliveMessage(self.bully_id).to_string()
-                while checking_tries < CHECK_RETRIES:
-                    slave_response = self.bully_middleware.send(message, instance_id, SLAVES_TIMEOUT, self._handle_message)
+                while checking_tries < self.check_retries:
+                    slave_response = self.bully_middleware.send(message, instance_id, self.slave_timeout, self._handle_message)
                     if not slave_response:
                         checking_tries+=1
-                        time.sleep(CHECK_FRECUENCY)
+                        time.sleep(self.check_frecuency)
                     else:
                         break 
-                if checking_tries == CHECK_RETRIES:
+                if checking_tries == self.check_retries:
                     logging.info("Slave [{}] is not responding".format(instance_id))
                     self.wake_up_slave(instance_id)
 
@@ -116,14 +112,14 @@ class BullyTCPWorker:
         logging.debug("Checking leader alives")
         checking_tries = 0
         message = AliveMessage(self.bully_id).to_string()
-        while checking_tries < CHECK_RETRIES:
-            leader_response = self.bully_middleware.send(message, self.leader.value, LEADER_TIMEOUT, self._handle_message)
+        while checking_tries < self.check_retries:
+            leader_response = self.bully_middleware.send(message, self.leader.value, self.leader_timeout, self._handle_message)
             if not leader_response:
                 checking_tries+=1
-                time.sleep(CHECK_FRECUENCY)
+                time.sleep(self.check_frecuency)
             else:
                 break 
-        if checking_tries == CHECK_RETRIES:
+        if checking_tries == self.check_retries:
             logging.info("Leader [{}] is not responding".format(self.leader.value))
             self._start_election()
 
@@ -142,7 +138,7 @@ class BullyTCPWorker:
         logging.info("Starting leader election")
         self.leader.value = NO_LEADER
         election = LeaderElectionMessage(self.bully_id)
-        election_responses = self.bully_middleware.send_to_sups(election.to_string(), ELECTION_TIMEOUT, self._handle_message)
+        election_responses = self.bully_middleware.send_to_sups(election.to_string(), self.election_timeout, self._handle_message)
         if not any(election_responses):
             self._setme_as_leader()
 
@@ -153,7 +149,7 @@ class BullyTCPWorker:
         logging.info("Setting me as leader and tell others")
         self.leader.value = self.bully_id
         election = CoordinatorMessage(self.bully_id)
-        self.bully_middleware.send_to_all(election.to_string(), ELECTION_TIMEOUT, self._handle_message)
+        self.bully_middleware.send_to_all(election.to_string(), self.election_timeout, self._handle_message)
 
     def _handle_message(self, connection, message: str) -> bool:
         """Handle Message\n

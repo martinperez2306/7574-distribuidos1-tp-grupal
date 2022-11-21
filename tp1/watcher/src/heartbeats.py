@@ -1,23 +1,20 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 import os
 
-from common.constants import NO_HEARTBEAT_CODE, SERVICE_HEARTBEAT_TIMEOUT
+from common.constants import SERVICE_HEARTBEAT_TIMEOUT
 
 class Heartbeats:
-    def __init__(self) -> None:
+    def __init__(self, config_params) -> None:
         self.hearbeats = dict()
+        self._init_hearbeats(config_params)
 
-    def hearbeat(self, service_id):
-        if service_id:
-            self.hearbeats[service_id] = self._get_current_timestamp()
-
-    def init_hearbeats(self):
-        joiner_instances = int(os.environ['JOINER_INSTANCES'])
-        dropper_instances = int(os.environ['DROPPER_INSTANCES'])
-        trending_instances = int(os.environ['TRENDING_INSTANCES'])
-        thumbnail_instances = int(os.environ['THUMBNAIL_INSTANCES'])
-        like_filter_instances = int(os.environ['LIKE_FILTER_INSTANCES'])
+    def _init_hearbeats(self, config_params):
+        joiner_instances = int(config_params['joiner_instances'])
+        dropper_instances = int(config_params['dropper_instances'])
+        trending_instances = int(config_params['trending_instances'])
+        thumbnail_instances = int(config_params['thumbnail_instances'])
+        like_filter_instances = int(config_params['like_filter_instances'])
         self._init_service_hearbeats("joiner", joiner_instances)
         self._init_service_hearbeats("dropper", dropper_instances)
         self._init_service_hearbeats("trending", trending_instances)
@@ -28,6 +25,10 @@ class Heartbeats:
         for i in range(service_instances):
             service_id = service_name + "_" + str(i)
             self.hearbeat(service_id)
+
+    def hearbeat(self, service_id):
+        if service_id:
+            self.hearbeats[service_id] = self._get_current_timestamp()
 
     def get_unavailable_services(self) -> list:
         unavailable_services = list()

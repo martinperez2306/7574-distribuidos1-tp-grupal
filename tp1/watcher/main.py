@@ -19,7 +19,7 @@ def main():
     logging.getLogger("pika").setLevel(logging.ERROR)
 
     # Initialize Watcher and application loops
-    watcher = Watcher()
+    watcher = Watcher(config_params)
     watcher.start()
     
     logging.info('Bye bye!')

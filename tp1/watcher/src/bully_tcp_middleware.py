@@ -14,13 +14,13 @@ class BullyTCPMiddleware(object):
         * Slave - Slave
     """
 
-    def __init__(self, port, bully_id, bully_instances, work_group) -> None:
+    def __init__(self, config_params, work_group) -> None:
         """
         Creates a new istance of BullyTCPMiddlware
         """
-        self.port = int(port)
-        self.bully_id = int(bully_id)
-        self.bully_instances = int(bully_instances)
+        self.port = int(config_params['service_port'])
+        self.bully_id = int(config_params['instance_id'])
+        self.bully_instances = int(config_params['watchers_instances'])
         self.work_group = work_group
         self.server_socket = None
     

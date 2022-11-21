@@ -9,9 +9,9 @@ from src.bully_tcp_worker import BullyTCPWorker
 WATCHER_GROUP = "watcher"
 
 class Watcher(BullyTCPWorker):
-    def __init__(self) -> None:
+    def __init__(self, config_params) -> None:
         super().__init__(WATCHER_GROUP)
-        self.heartbeats = Heartbeats()
+        self.heartbeats = Heartbeats(config_params)
         self.docker = docker.from_env()
         signal.signal(signal.SIGTERM, self.exit_gracefully)
         signal.signal(signal.SIGINT, self.exit_gracefully)
@@ -24,7 +24,6 @@ class Watcher(BullyTCPWorker):
             - Heartbeat process (Main process)
         """
         logging.info('Watcher started')
-        self.heartbeats.init_hearbeats()
         super().start()
         self.watcher_middleware.run()
         self.watcher_middleware.accept_heartbeats(self.handle_heartbeat)
