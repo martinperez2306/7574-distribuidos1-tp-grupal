@@ -20,7 +20,7 @@ class BullyTCPMiddleware(object):
         self.port = int(config_params['service_port'])
         self.bully_id = int(config_params['instance_id'])
         self.bully_instances = int(config_params['watchers_instances'])
-        self.listening_timeout = int(config_params['bully_listening_timeout'])
+        self.listening_timeout = float(config_params['bully_listening_timeout'])
         self.work_group = work_group
         self.server_socket = None
     
