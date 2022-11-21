@@ -23,6 +23,8 @@ class ClientMiddleware(Middleware):
         super().send_message(DROPPER_INPUT_QUEUE, message)
 
     def recv_result_message(self, callback):
-        super().recv_message(RESULTS_QUEUE, lambda ch, method,
-                             properties, body: callback(body.decode()), True)
+        self.result_tag = super().recv_message(RESULTS_QUEUE, callback)
         self.channel.start_consuming()
+
+    def stop_recv_result_message(self):
+        super().stop_recv_message(self.result_tag)

@@ -43,7 +43,8 @@ class ServerConnection(Worker):
         self.send_processed_csv()
 
         self.middleware.recv_result_message(self.recv_results)
-
+        self.middleware.close_connection()
+        
     def send_categories(self):
         print(self.client_id)
 
@@ -114,7 +115,7 @@ class ServerConnection(Worker):
     def recv_results(self, message):
         if self.is_end_result(message):
             logging.info(f'Recv All Responses!')
-            self.exit_gracefully()
+            self.middleware.stop_recv_result_message()
             return
 
         self.process_result1_message(message)
