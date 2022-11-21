@@ -63,7 +63,8 @@ class BullyTCPWorker:
         """
         self.bully_middleware.initialize()
         while self.running.value:
-            self.bully_middleware.accept_connection(self._handle_message)
+            connection_message = self.bully_middleware.accept_connection(self._handle_message)
+            self._perform_post_connection_action(connection_message)
         self.bully_middleware.finalize()
 
     def _start_bully(self):
@@ -75,7 +76,7 @@ class BullyTCPWorker:
         if self.bully_id == (self.bully_instances -1):
             self._setme_as_leader()
         else:
-            self._start_election()
+            self._start_election(False)
 
     def _check_alive(self):
         """Check Alive\n
@@ -124,7 +125,7 @@ class BullyTCPWorker:
                 break 
         if checking_tries == self.check_retries:
             logging.info("Leader [{}] is not responding".format(self.leader.value))
-            self._start_election()
+            self._start_election(False)
 
     def wake_up_slave(self, instance_id):
         logging.info("Waking up instance with id [{}]".format(instance_id))
@@ -141,47 +142,58 @@ class BullyTCPWorker:
            - ErrorMessage
         """
         logging.debug('Handling Message [{}]'.format(message))
-        election = ElectionMessage.of(message)
-        if TimeoutMessage.is_election(election):
+        election_message = ElectionMessage.of(message)
+        if TimeoutMessage.is_election(election_message):
             logging.debug("Timeout message!")
             return None
-        elif ErrorMessage.is_election(election):
+        elif ErrorMessage.is_election(election_message):
             logging.debug("Error message!")
             return None
-        elif AliveMessage.is_election(election):
+        elif AliveMessage.is_election(election_message):
             alive_answer_message = AliveAnswerMessage(self.bully_id).to_string()
             logging.debug("Responding alive message")
             self.bully_middleware.send_to_connection(alive_answer_message, connection)
-        elif AliveAnswerMessage.is_election(election):
+        elif AliveAnswerMessage.is_election(election_message):
             if self.im_leader():
                 logging.debug("Slave is alive")
             else:
                 logging.debug("Leader is alive")
-        elif LeaderElectionMessage.is_election(election):
-            logging.debug("Responding and starting leader election")
+        elif LeaderElectionMessage.is_election(election_message):
+            logging.debug("Responding leader election")
             election_answer_message = ElectionAnswerMessage(self.bully_id).to_string()
             self.bully_middleware.send_to_connection(election_answer_message, connection)
-            self._start_election()
-        elif ElectionAnswerMessage.is_election(election):
+        elif ElectionAnswerMessage.is_election(election_message):
             logging.debug("Election answer message receive")
-            #TODO: Add timeout for election answer receive and Coordinator message. If no coordinator message arrives after election answer message, proclaims at leader.
-        elif CoordinatorMessage.is_election(election):
-            self.leader.value = election.id
+        elif CoordinatorMessage.is_election(election_message):
+            self.leader.value = election_message.id
             self.is_election_in_progress.value = False
             if self.im_leader():
-                logging.debug("Coordination message answer message receive")
+                logging.debug("Coordination answer message receive")
             else:
-                logging.info("New Leader was selected [{}]".format(election.id))
+                logging.info("New Leader was selected [{}]".format(election_message.id))
                 self.bully_middleware.send_to_connection(message, connection)
-        return election
+            with self.election_condition:
+                self.election_condition.notify_all()
+        return election_message
 
-    def _start_election(self):
+    def _perform_post_connection_action(self, election_message):
+        if election_message:
+            if LeaderElectionMessage.is_election(election_message):
+                self._start_election(False)
+            elif ElectionAnswerMessage.is_election(election_message):
+                with self.election_condition:
+                    self.election_condition.wait(timeout=self.election_timeout)
+                    if (self.leader == NO_LEADER and self.is_election_in_progress.value):
+                        self._start_election(True)
+
+    def _start_election(self, force: bool):
         """Start Election\n
            This method starts new leader election acording to Bully Algorithm.\n
            - If has not already started an election, sends a Leader Election Message and waits for Answer Election Message
            - If no answer received, it proclaims himself as a leader
+           - If `force` is provided, forces the leader election even if it has already started
         """
-        if self.is_election_in_progress.value:
+        if self.is_election_in_progress.value and not force:
             logging.info("Leader election in progress")
             return
         logging.info("Starting leader election")
