@@ -1,14 +1,20 @@
 #!/usr/bin/env python
-import logging
 import os
+import logging
+from configparser import ConfigParser
 
+from src.config import DEFAULT_CONFIG
 from src.watcher import Watcher
 
+CONFIG_PATH = "./config/config.ini"
+
 def main():
-    initialize_log(os.getenv("LOGGING_LEVEL") or 'INFO')
+    config_params = initialize_config(CONFIG_PATH)
+    initialize_log(config_params["logging_level"])
     
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
+    logging.info("Watcher configuration: {}".format(config_params))
     logging.info("Watcher starting work")
     logging.getLogger("pika").setLevel(logging.ERROR)
 
@@ -17,6 +23,22 @@ def main():
     watcher.start()
     
     logging.info('Bye bye!')
+
+def initialize_config(config_path):
+    config_params = {}
+    config = ConfigParser(os.environ)
+    for env_key in config["DEFAULT"]:  
+        config_params[env_key] = config["DEFAULT"][env_key]
+    # If config.ini does not exists original config object is not modified
+    config.read(config_path)
+    for default_key in DEFAULT_CONFIG: 
+        try:
+            config_params[default_key] = config["DEFAULT"][default_key]
+        except KeyError as e:
+            config_params[default_key] = DEFAULT_CONFIG[default_key]
+        except ValueError as e:
+            raise ValueError("Key could not be parsed. Error: {}. Aborting server".format(e))
+    return config_params
 
 def initialize_log(logging_level):
     """

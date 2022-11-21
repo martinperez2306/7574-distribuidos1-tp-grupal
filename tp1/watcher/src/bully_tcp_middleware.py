@@ -48,19 +48,19 @@ class BullyTCPMiddleware(object):
         message = self._recv(connection, expected_length_message)
         callback(connection, message)
 
-    def send_to_infs(self, message: str, timeout: int, callback) -> list['bool']:
+    def send_to_infs(self, message: str, timeout: float, callback) -> list['bool']:
         instances = range(self.bully_id)
         return self._send_to(message, instances, timeout, callback)
 
-    def send_to_sups(self, message: str, timeout: int, callback) -> list['bool']:
+    def send_to_sups(self, message: str, timeout: float, callback) -> list['bool']:
         instances = range(self.bully_id, self.bully_instances)
         return self._send_to(message, instances, timeout, callback)
 
-    def send_to_all(self, message: str, timeout: int, callback) -> list['bool']:
+    def send_to_all(self, message: str, timeout: float, callback) -> list['bool']:
         instances = range(self.bully_instances)
         return self._send_to(message, instances, timeout, callback)
     
-    def _send_to(self, message: str, instances: list['int'], timeout, callback) -> list['bool']:
+    def _send_to(self, message: str, instances: list['int'], timeout: float, callback) -> list['bool']:
         sends_sucessfully = list()
         for instance_id in instances:
             if instance_id != self.bully_id:
@@ -68,7 +68,7 @@ class BullyTCPMiddleware(object):
                 sends_sucessfully.append(send_sucessfully)
         return sends_sucessfully
 
-    def send(self, message: str, instance_id: int, timeout: int, callback) -> bool:
+    def send(self, message: str, instance_id: int, timeout: float, callback) -> bool:
         """Send
            Send message to a instance.
            If a `timeout` is specified, it waits to receive a response in that period of time.
