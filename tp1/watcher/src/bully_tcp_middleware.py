@@ -6,8 +6,8 @@ BUFFER_SIZE = 1024
 ENCODING = "utf-8"
 
 class BullyTCPMiddleware(object):
-    """BullyTCPMiddlware
-    This class provides a communication layer between bully workers.
+    """BullyTCPMiddlware\n
+    This class provides a communication layer between bully workers.\n
     The communication can be 
         * Master - Slave
         * Slave - Slave
@@ -32,49 +32,52 @@ class BullyTCPMiddleware(object):
 
     def accept_connection(self, callback):
         logging.debug("Accept connections in port [{}]".format(self.port))
+        callback_result = None
         self.server_socket.settimeout(self.listening_timeout)
         try:
             connection, _addr = self.server_socket.accept()
-            self._handle_connection(connection, callback)
+            callback_result = self._handle_connection(connection, callback)
         except socket.timeout as timeout:
             pass #Timeout await connections is expected
         except socket.error as error:
             logging.error("Error while accept connection in server socket {}. Error: {}".format(self.server_socket, error))
             self.server_socket.close()
+        self.server_socket.settimeout(None)
+        return callback_result
             
     def _handle_connection(self, connection: socket.socket, callback):
         logging.debug("Handling connection [{}]".format(connection))
         expected_length_message = ELECTION_LENGTH_MESSAGE + len(str(self.bully_instances))
         message = self._recv(connection, expected_length_message)
-        callback(connection, message)
+        return callback(connection, message)
 
-    def send_to_infs(self, message: str, timeout: float, callback) -> list['bool']:
+    def send_to_infs(self, message: str, timeout: float, callback) -> list:
         instances = range(self.bully_id)
         return self._send_to(message, instances, timeout, callback)
 
-    def send_to_sups(self, message: str, timeout: float, callback) -> list['bool']:
+    def send_to_sups(self, message: str, timeout: float, callback) -> list:
         instances = range(self.bully_id, self.bully_instances)
         return self._send_to(message, instances, timeout, callback)
 
-    def send_to_all(self, message: str, timeout: float, callback) -> list['bool']:
+    def send_to_all(self, message: str, timeout: float, callback) -> list:
         instances = range(self.bully_instances)
         return self._send_to(message, instances, timeout, callback)
     
-    def _send_to(self, message: str, instances: list['int'], timeout: float, callback) -> list['bool']:
-        sends_sucessfully = list()
+    def _send_to(self, message: str, instances: list['int'], timeout: float, callback) -> list:
+        callback_results = list()
         for instance_id in instances:
             if instance_id != self.bully_id:
-                send_sucessfully = self.send(message, instance_id, timeout, callback)
-                sends_sucessfully.append(send_sucessfully)
-        return sends_sucessfully
+                callback_result = self.send(message, instance_id, timeout, callback)
+                callback_results.append(callback_result)
+        return callback_results
 
-    def send(self, message: str, instance_id: int, timeout: float, callback) -> bool:
-        """Send
-           Send message to a instance.
-           If a `timeout` is specified, it waits to receive a response in that period of time.
-           Return bool representation of send successfully.
+    def send(self, message: str, instance_id: int, timeout: float, callback):
+        """Send\n
+           Send message to a instance.\n
+           If a `timeout` is specified, it waits to receive a response in that period of time.\n
+           Returns callback's result.
         """
-        sends_sucessfully = False
+        callback_result = None
         host = self.work_group + "_" + str(instance_id)
         port = self.port
         logging.debug("Sending [{}] to Host [{}] and Port [{}]".format(message, host, port))
@@ -83,10 +86,10 @@ class BullyTCPMiddleware(object):
                 connection.sendall(message.encode(ENCODING))
                 expected_length_message = ELECTION_LENGTH_MESSAGE + len(str(self.bully_instances))
                 response = self._recv_timeout(connection, expected_length_message, timeout)
-                sends_sucessfully = callback(connection, response)
+                callback_result = callback(connection, response)
         except socket.error as error:
             logging.error("Error while create connection to socket. Error: {}".format(error))
-        return sends_sucessfully
+        return callback_result
 
     def send_to_connection(self, message: str, connection: socket.socket):
         connection.sendall(message.encode(ENCODING))
