@@ -5,10 +5,9 @@ from ctypes import c_bool, c_int
 from multiprocessing import Condition, Process, Queue, Value
 
 from src.bully_tcp_middleware import BullyTCPMiddleware
-from src.election_message import AliveAnswerMessage, AliveMessage, CoordinatorMessage, ElectionAnswerMessage, ElectionMessage, ErrorMessage, LeaderElectionMessage, TimeoutMessage
+from src.election_message import AliveAnswerMessage, AliveMessage, CoordinatorMessage, ElectionAnswerMessage, ElectionMessage, EmptyMessage, ErrorMessage, LeaderElectionMessage, TimeoutMessage
 
 NO_LEADER = -1
-END_EVENT = "END"
 
 class BullyTCPWorker:
     """BullyTCPWorker\n
@@ -29,14 +28,14 @@ class BullyTCPWorker:
         self.work_group = work_group
         self.docker = docker.from_env()
         self.bully_middleware = BullyTCPMiddleware(config_params, self.work_group)
-        self.accept_connections_process: Process = None
-        self.event_process: Process = None
-        self.start_bully_process: Process = None
+        self.bully_action_process: Process = None
+        self.bully_listening_process: Process = None
+        self.bully_init_process: Process = None
         self.check_process: Process = None
         ####CRITICAL SECTION####
         self.running = Value(c_bool, False)
         self.leader = Value(c_int, NO_LEADER)
-        self.event_queue = Queue()
+        self.connection_action_queue = Queue()
         self.is_election_in_progress = Value(c_bool, False)
         self.election_condition = Condition()
         ######################
@@ -44,40 +43,52 @@ class BullyTCPWorker:
     def start(self):
         """Start\n
             Starts Bully processes
-            - Bully Middleware process (Backgroud process)
+            - Bully Action process (Backgroud process)
+            - Bully Listening process (Backgroud process)
             - Bully Init process (Backgroud process)
             - Bully Check process (Backgroud process)\n
             Each process will have a copy of the middleware. 
         """
         logging.info("BullyTCPWorker started")
         self.running.value = True
-        self.event_process = Process(target=self._handle_event)
-        self.event_process.start()
-        self.accept_connections_process = Process(target=self._accept_connections)
-        self.accept_connections_process.start()
-        self.start_bully_process = Process(target=self._start_bully)
-        self.start_bully_process.start()
+        self.bully_action_process = Process(target=self._perform_connection_action)
+        self.bully_action_process.start()
+        self.bully_listening_process = Process(target=self._accept_connections)
+        self.bully_listening_process.start()
+        self.bully_init_process = Process(target=self._start_bully)
+        self.bully_init_process.start()
         self.check_process = Process(target=self._check_alive)
         self.check_process.start()
     
-    def _handle_event(self):
+    def _perform_connection_action(self):
         """Handle Event \n
             Performs a post-connection action according to the message received by a connection 
         """
         while self.running.value:
-            connection_message = self.event_queue.get()
+            connection_message = self.connection_action_queue.get()
             self._perform_post_connection_action(connection_message)
+
+    def _perform_post_connection_action(self, election_message):
+        if election_message:
+            if LeaderElectionMessage.is_election(election_message):
+                self._start_election(False)
+            elif ElectionAnswerMessage.is_election(election_message):
+                with self.election_condition:
+                    self.election_condition.wait(timeout=self.election_timeout)
+                    if (self.leader == NO_LEADER and self.is_election_in_progress.value):
+                        self._start_election(True)
 
     def _accept_connections(self):
         """Accept Connections\n
             Initialize Bully Middleware and waits for Bully worker stop.\n
-            This process has `bully_middleware` copy responsable to accept conections and handle messages.
+            This process has `bully_middleware` copy responsable to accept conections and handle messages.\n
+            Sends connection message to Action Queue in order to perform corresponding action.
         """
         self.bully_middleware.initialize()
         while self.running.value:
             connection_message = self.bully_middleware.accept_connection(self._handle_message)
             if connection_message:
-                self.event_queue.put(connection_message)
+                self.connection_action_queue.put(connection_message)
         self.bully_middleware.finalize()
 
     def _start_bully(self):
@@ -189,16 +200,6 @@ class BullyTCPWorker:
                 self.election_condition.notify_all()
         return election_message
 
-    def _perform_post_connection_action(self, election_message):
-        if election_message:
-            if LeaderElectionMessage.is_election(election_message):
-                self._start_election(False)
-            elif ElectionAnswerMessage.is_election(election_message):
-                with self.election_condition:
-                    self.election_condition.wait(timeout=self.election_timeout)
-                    if (self.leader == NO_LEADER and self.is_election_in_progress.value):
-                        self._start_election(True)
-
     def _start_election(self, force: bool):
         """Start Election\n
            This method starts new leader election acording to Bully Algorithm.\n
@@ -235,9 +236,9 @@ class BullyTCPWorker:
             Stops bully worker and waits for all worker process to finish.
         """
         self.running.value = False
-        self.start_bully_process.join()
         self.check_process.join()
-        self.accept_connections_process.join()
-        self.event_queue.put(END_EVENT)
-        self.event_process.join()
+        self.bully_init_process.join()
+        self.bully_listening_process.join()
+        self.connection_action_queue.put(EmptyMessage())
+        self.bully_action_process.join()
         logging.info('BullyTCPWorker stopped')

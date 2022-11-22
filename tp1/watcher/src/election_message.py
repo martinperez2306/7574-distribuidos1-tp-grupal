@@ -10,6 +10,8 @@ ELECTION_ANSWER_MESSAGE = 'EAM'
 TIMEOUT_MESSAGE = 'TOM'
 ERROR_MESSAGE = 'ERM'
 
+EMPTY_MESSAGE = "EPM"
+
 class ElectionMessage:
     def __init__(self, type: str, id: int) -> None:
         self.CODE = None
@@ -89,3 +91,12 @@ class ErrorMessage(ElectionMessage):
     @staticmethod
     def is_election(election: ElectionMessage) -> bool:
         return election.type == ERROR_MESSAGE
+
+class EmptyMessage(ElectionMessage):
+    def __init__(self) -> None:
+        super().__init__(EMPTY_MESSAGE, -1)
+        self.CODE = EMPTY_MESSAGE
+
+    @staticmethod
+    def is_election(election: ElectionMessage) -> bool:
+        return election.type == EMPTY_MESSAGE

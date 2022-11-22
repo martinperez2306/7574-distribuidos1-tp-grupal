@@ -82,7 +82,7 @@ class BullyTCPMiddleware(object):
         port = self.port
         logging.debug("Sending [{}] to Host [{}] and Port [{}]".format(message, host, port))
         try:
-            with socket.create_connection((host, port)) as connection:
+            with socket.create_connection((host, port), timeout=timeout) as connection:
                 connection.sendall(message.encode(ENCODING))
                 expected_length_message = ELECTION_LENGTH_MESSAGE + len(str(self.bully_instances))
                 response = self._recv_timeout(connection, expected_length_message, timeout)
@@ -99,6 +99,7 @@ class BullyTCPMiddleware(object):
 
     def _recv(self, connection: socket.socket, expected_length_message: int) -> str:
         data = b''
+        connection.settimeout(None)
         while len(data) < expected_length_message:
             try:
                 data += connection.recv(BUFFER_SIZE)
