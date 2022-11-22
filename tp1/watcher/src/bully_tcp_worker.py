@@ -76,7 +76,8 @@ class BullyTCPWorker:
         self.bully_middleware.initialize()
         while self.running.value:
             connection_message = self.bully_middleware.accept_connection(self._handle_message)
-            self.event_queue.put(connection_message)
+            if connection_message:
+                self.event_queue.put(connection_message)
         self.bully_middleware.finalize()
 
     def _start_bully(self):
