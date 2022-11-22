@@ -168,10 +168,10 @@ class BullyTCPWorker:
         logging.debug('Handling Message [{}]'.format(message))
         election_message = ElectionMessage.of(message)
         if TimeoutMessage.is_election(election_message):
-            logging.debug("Timeout message!")
+            logging.error("Timeout message! [{}]".format(message))
             return None
         elif ErrorMessage.is_election(election_message):
-            logging.debug("Error message!")
+            logging.error("Error message! [{}]".format(message))
             return None
         elif AliveMessage.is_election(election_message):
             alive_answer_message = AliveAnswerMessage(self.bully_id).to_string()
@@ -179,15 +179,15 @@ class BullyTCPWorker:
             self.bully_middleware.send_to_connection(alive_answer_message, connection)
         elif AliveAnswerMessage.is_election(election_message):
             if self.im_leader():
-                logging.debug("Slave is alive")
+                logging.debug("Slave [{}] is alive!".format(election_message.id))
             else:
-                logging.debug("Leader is alive")
+                logging.debug("Leader [{}] is alive!".format(election_message.id))
         elif LeaderElectionMessage.is_election(election_message):
-            logging.info("Responding leader election {}".format(message))
+            logging.info("Responding leader election [{}]".format(message))
             election_answer_message = ElectionAnswerMessage(self.bully_id).to_string()
             self.bully_middleware.send_to_connection(election_answer_message, connection)
         elif ElectionAnswerMessage.is_election(election_message):
-            logging.info("Election answer message receive {}".format(message))
+            logging.info("Election answer message receive [{}]".format(message))
         elif CoordinatorMessage.is_election(election_message):
             self.leader.value = election_message.id
             self.is_election_in_progress.value = False
