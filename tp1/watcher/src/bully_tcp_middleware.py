@@ -1,4 +1,5 @@
 import logging
+from multiprocessing import Process, Queue
 import socket
 from src.election_message import ELECTION_LENGTH_MESSAGE, ErrorMessage, TimeoutMessage
 
@@ -70,6 +71,24 @@ class BullyTCPMiddleware(object):
                 callback_result = self.send(message, instance_id, timeout, callback)
                 callback_results.append(callback_result)
         return callback_results
+
+    def _send_to_async(self, message: str, instances: list['int'], timeout: float, callback) -> list:
+        callback_results = list()
+        resulst_queue = Queue()
+        send_processes = list()
+        for instance_id in instances:
+            if instance_id != self.bully_id:
+                process = Process(target=self._send_async, args=(message, instance_id, timeout, callback, resulst_queue))
+                process.start()
+                send_processes.append(process)
+        for process in send_processes:
+            process.join()
+            callback_results.append(resulst_queue.get())
+        return callback_results
+
+    def _send_async(self, message: str, instance_id: int, timeout: float, callback, result_queue: Queue):
+        callback_result = self.send(message, instance_id, timeout, callback)
+        result_queue.put(callback_result)
 
     def send(self, message: str, instance_id: int, timeout: float, callback):
         """Send\n
