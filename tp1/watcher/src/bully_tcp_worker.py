@@ -126,7 +126,7 @@ class BullyTCPWorker:
                     slave_response = self.bully_middleware.send(message, instance_id, self.slave_timeout, self._handle_message)
                     if not slave_response:
                         checking_tries+=1
-                        time.sleep(self.check_frecuency)
+                        time.sleep(self.slave_timeout)
                     else:
                         break 
                 if checking_tries == self.check_retries:
@@ -144,7 +144,7 @@ class BullyTCPWorker:
             leader_response = self.bully_middleware.send(message, self.leader.value, self.leader_timeout, self._handle_message)
             if not leader_response:
                 checking_tries+=1
-                time.sleep(self.check_frecuency)
+                time.sleep(self.leader_timeout)
             else:
                 break 
         if checking_tries == self.check_retries:
@@ -152,10 +152,11 @@ class BullyTCPWorker:
             self._start_election(False)
 
     def wake_up_slave(self, instance_id):
-        logging.info("Waking up instance with id [{}]".format(instance_id))
-        service = self.work_group + "_" + str(instance_id)
-        self.docker.api.stop(service)
-        self.docker.api.start(service)
+        if self.im_leader():
+            logging.info("Waking up instance with id [{}]".format(instance_id))
+            service = self.work_group + "_" + str(instance_id)
+            self.docker.api.stop(service)
+            self.docker.api.start(service)
 
     def _handle_message(self, connection, message: str):
         """Handle Message\n
