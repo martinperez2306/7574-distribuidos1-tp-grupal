@@ -7,17 +7,21 @@ class CategoryMapper:
     def __init__(self) -> None:
         self.categories = {}
 
-    def load_category_file(self, file_name: str, file: json):
+    def load_category_file(self, client_id: str, file_name: str, file: json):
+        self.categories.setdefault(client_id, {})
+        client_categories = self.categories[client_id]
+
         category = json.loads(file)
         country = file_name.replace(CATEGORY_SUBFIX, '')
-        self.categories[country] = {}
+        client_categories[country] = {}
 
         for el in category['items']:
-            self.categories[country][el['id']] = el['snippet']['title']
+            client_categories[country][el['id']] = el['snippet']['title']
 
-    def len(self):
-        return len(self.categories)
+    def len(self, client_id: str):
+        return len(self.categories.get(client_id))
 
-    def map_category(self, country: str, categoryId: str) -> str:
-        category_catalog = self.categories[country]
+    def map_category(self, client_id:str, country: str, categoryId: str) -> str:
+        client_categories = self.categories[client_id]
+        category_catalog = client_categories[country]
         return category_catalog[categoryId]
