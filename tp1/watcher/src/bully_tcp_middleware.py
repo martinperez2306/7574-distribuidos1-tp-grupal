@@ -73,9 +73,9 @@ class BullyTCPMiddleware(object):
 
     def send(self, message: str, instance_id: int, timeout: float, callback):
         """Send\n
-           Send message to a instance.\n
-           If a `timeout` is specified, it waits to receive a response in that period of time.\n
-           Returns callback's result.
+            Create connection and send message to a instance.\n
+            If a `timeout` is specified, it waits to receive a response in that period of time.\n
+            Returns callback's result.
         """
         callback_result = None
         host = self.work_group + "_" + str(instance_id)
@@ -92,6 +92,9 @@ class BullyTCPMiddleware(object):
         return callback_result
 
     def send_to_connection(self, message: str, connection: socket.socket):
+        """Send To Connection\n
+            Sends message to existing connection
+        """
         connection.sendall(message.encode(ENCODING))
 
     def _recv(self, connection: socket.socket, expected_length_message: int) -> str:
