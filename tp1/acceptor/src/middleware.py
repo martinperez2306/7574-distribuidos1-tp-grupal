@@ -11,7 +11,7 @@ class AcceptorMiddlware(Middleware):
             queue=CLIENT_ACCEPT_QUEUE, durable=True)
 
         self.channel.queue_declare(
-            queue=RESULTS_QUEUE)
+            queue=RESULTS_QUEUE, durable=True)
         self.channel.basic_qos(prefetch_count=30)
 
     def recv_results_messages(self, callback):
@@ -21,7 +21,6 @@ class AcceptorMiddlware(Middleware):
         self.client_tag = super().recv_message(CLIENT_ACCEPT_QUEUE, callback)
 
     def send_result(self, client_id, message):
-
         super().send_message(client_id, message)
 
     def stop_recv_client_messages(self):

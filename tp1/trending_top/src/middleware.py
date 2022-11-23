@@ -10,7 +10,7 @@ class TrendingTopMiddleware(Middleware):
         super().__init__()
 
         self.channel.queue_declare(queue=TRENDING_TOP_QUEUE)
-        self.channel.queue_declare(queue=RESULTS_QUEUE)
+        self.channel.queue_declare(queue=RESULTS_QUEUE, durable=True)
 
     def recv_result_message(self, callback):
 

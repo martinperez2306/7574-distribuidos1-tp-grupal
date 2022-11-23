@@ -9,7 +9,7 @@ class DownloaderMiddleware(Middleware):
         super().__init__()
 
         self.channel.queue_declare(queue=DOWNLOAD_QUEUE)
-        self.channel.queue_declare(queue=RESULTS_QUEUE)
+        self.channel.queue_declare(queue=RESULTS_QUEUE, durable=True)
 
     def recv_video_message(self, callback):
 

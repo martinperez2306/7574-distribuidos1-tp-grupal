@@ -35,8 +35,7 @@ class Acceptor(HeartbeathedWorker):
             self.stop_recv_client_messages()
 
     def on_result_message(self, message):
-        logging.info('RESULT MESSAGE')
-
+        
         end_result = None
         base_message, _ = BaseMessage.decode(message)
 
