@@ -3,12 +3,12 @@ import logging
 from common.heartbeathed_worker import HeartbeathedWorker
 from common.message import MessageEnd, Result3, VideoMessage
 from datetime import datetime
-
+from .model import Grouper
 
 class TrendingInstance(HeartbeathedWorker):
     def __init__(self, middleware) -> None:
         super().__init__(middleware)
-        self.dates = {}
+        self.grouper = Grouper()
 
     def run(self):
         self.middleware.recv_video_message(self.recv_videos)
@@ -17,10 +17,11 @@ class TrendingInstance(HeartbeathedWorker):
 
         if MessageEnd.is_message(message):
             end_message = MessageEnd.decode(message)
+            client_id = end_message.client_id
             logging.info(
-                f'Finish Recv Videos: {len(self.dates)}')
+                f'Finish Recv Videos for client: {client_id}. Found {self.grouper.len(client_id)} days')
 
-            self.process_and_send_results(end_message.client_id)
+            self.process_and_send_results(client_id)
             return
 
         video = VideoMessage.decode(message)
@@ -32,7 +33,9 @@ class TrendingInstance(HeartbeathedWorker):
                     video.content['trending_date'], '%Y-%m-%dT%H:%M:%SZ')
 
                 views = int(video.content['view_count'])
-                self.group_date(date, views)
+                client_id = video.client_id
+
+                self.grouper.add_value(client_id, date, views)
 
         except KeyError:
             logging.error(
@@ -43,24 +46,13 @@ class TrendingInstance(HeartbeathedWorker):
 
     def process_and_send_results(self, client_id):
 
-        max_date = ''
-        max_number = 0
+        max_date, max_number = self.grouper.get_max(client_id)
 
-        for date in self.dates:
-            if(self.dates[date] > max_number):
-                max_number = self.dates[date]
-                max_date = date
-
-        result = Result3(client_id, "TODO:INSTANCE_ID", f"{max_date},{max_number}")
+        result = Result3(client_id, self.id, f"{max_date},{max_number}")
         self.middleware.send_result_message(result.pack())
 
-        self.dates = {}
         return
 
-    def group_date(self, date, views):
+    
 
-        datem = date.strftime("%Y-%m-%d")
-        self.dates.setdefault(datem, 0)
-        self.dates[datem] += views
-        # logging.info(self.dates[datem])
-        return
+        
