@@ -31,9 +31,12 @@ class ThumbnailInstance(HeartbeathedWorker):
     def recv_videos(self, message):
 
         if MessageEnd.is_message(message):
+            decoded_message = MessageEnd.decode(message)
+            decoded_message.message_id = self.id
+
             logging.info(
-                f'Finish Recv Videos')
-            self.middleware.send_result_message(message)
+                f'Finish Grouping Videos for Client: {decoded_message.client_id}')
+            self.middleware.send_result_message(decoded_message.pack())
             return
             
         video = VideoMessage.decode(message)

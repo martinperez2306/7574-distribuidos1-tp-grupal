@@ -15,10 +15,11 @@ class ThumbnailRouter(HeartbeathedWorker):
     def recv_videos(self, message):
 
         if MessageEnd.is_message(message):
-
+            
             for id in range(self.nr_instances):
                 logging.info(
-                    f'Finish Recv Videos, message to instance: {id}')
+                    f'Finish Recv Videos. Forward end message to Thumbnail Instance: {id}')
+                
                 self.middleware.send_video_message(message, str(id))
 
             return
