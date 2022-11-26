@@ -201,7 +201,9 @@ do
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=joiner_${i}
-      - LOGGING_LEVEL=INFO"
+      - LOGGING_LEVEL=INFO
+    volumes:
+      - ./storage/joiner:/workspace/storage"
 
   BASE+="${JOINER_INSTANCE}"
 done
