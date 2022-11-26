@@ -10,6 +10,7 @@ FILE_SEPARATOR = "_"
 class CategoryMapper:
     def __init__(self) -> None:
         self.categories = {}
+        self._init_client_categories()
         
 
     def _init_client_categories(self):
@@ -20,7 +21,7 @@ class CategoryMapper:
                     client_categories = json.load(client_categories_file)
                     self.categories[client_id] = client_categories
 
-    def _extract_client_from_category_file_path(path):
+    def _extract_client_from_category_file_path(self, path):
         basename = str(os.path.basename(path))
         split = basename.split(FILE_SEPARATOR)
         return split[len(split) - 1]
