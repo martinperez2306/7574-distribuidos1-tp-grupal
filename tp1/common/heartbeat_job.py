@@ -35,5 +35,5 @@ class HearthbeatJob():
         logging.info("Exiting Heartbeat Job")
         self.running = False
 
-    # def stop(self):
+    def stop(self):
         self.process.terminate()
