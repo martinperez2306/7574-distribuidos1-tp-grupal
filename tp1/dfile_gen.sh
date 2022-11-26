@@ -14,6 +14,7 @@ THUMBNAIL_ROUTER_ENABLED="${9:-1}"
 DOWNLOADER_ENABLED="${10:-1}"
 TAG_UNIQUE_ENABLED="${11:-1}"
 TRENDING_TOP_ENABLED="${12:-1}"
+ACCEPTOR_ENABLED="${13:-1}"
 
 FILE_NAME="docker-compose.yaml"
 
@@ -32,9 +33,7 @@ services:
       test: ['CMD', 'curl', '-f', 'http://localhost:15672']
       interval: 10s
       timeout: 5s
-      retries: 5
-    logging:
-      driver: none"
+      retries: 5"
 
 for (( i = 0; i < $REPLICAS_CLIENT; i++ )) 
 do
@@ -55,9 +54,29 @@ do
       - THUMBNAIL_PATH=.temp
     volumes:
       - ./data/client${i}:/workspace/data
-      - ./.temp${i}:/workspace/.temp"
+      - ./.tmp/client_${i}:/workspace/.temp"
   BASE+="${CLIENT_INSTANCE}"
 done
+
+if [ $ACCEPTOR_ENABLED -eq 1 ]
+then
+  ACEPTOR_INSTANCE="
+  acceptor:
+    container_name: acceptor
+    build:
+      context: ./
+      dockerfile: ./acceptor/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=acceptor
+      - LOGGING_LEVEL=INFO"
+  
+  BASE+="${ACEPTOR_INSTANCE}"
+fi
 
 if [ $TRENDING_ROUTER_ENABLED -eq 1 ]
 then

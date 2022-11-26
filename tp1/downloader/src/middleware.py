@@ -8,8 +8,8 @@ class DownloaderMiddleware(Middleware):
     def __init__(self) -> None:
         super().__init__()
 
-        self.channel.queue_declare(queue=DOWNLOAD_QUEUE)
-        self.channel.queue_declare(queue=RESULTS_QUEUE)
+        self.channel.queue_declare(queue=DOWNLOAD_QUEUE, durable=True)
+        self.channel.queue_declare(queue=RESULTS_QUEUE, durable=True)
 
     def recv_video_message(self, callback):
 

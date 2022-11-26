@@ -7,6 +7,7 @@ class HeartbeathedWorker(Worker):
     def __init__(self, middleware) -> None:
         super().__init__(middleware)
         self.heartbeat_job = HearthbeatJob()
+        self.id =  os.environ['SERVICE_ID']
 
     def start(self):
         self.heartbeat_job.start()

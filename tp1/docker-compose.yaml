@@ -12,8 +12,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    logging:
-      driver: none
   client_0:
     container_name: client_0
     build:
@@ -30,7 +28,105 @@ services:
       - THUMBNAIL_PATH=.temp
     volumes:
       - ./data/client0:/workspace/data
-      - ./.temp0:/workspace/.temp
+      - ./.tmp/client_0:/workspace/.temp
+  client_1:
+    container_name: client_1
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile
+    entrypoint: /bin/sh -c 'while sleep 1000; do :; done'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+      - FILE_READER_LINES=20
+      - THUMBNAIL_PATH=.temp
+    volumes:
+      - ./data/client1:/workspace/data
+      - ./.tmp/client_1:/workspace/.temp
+  client_2:
+    container_name: client_2
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile
+    entrypoint: /bin/sh -c 'while sleep 1000; do :; done'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+      - FILE_READER_LINES=20
+      - THUMBNAIL_PATH=.temp
+    volumes:
+      - ./data/client2:/workspace/data
+      - ./.tmp/client_2:/workspace/.temp
+  client_3:
+    container_name: client_3
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile
+    entrypoint: /bin/sh -c 'while sleep 1000; do :; done'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+      - FILE_READER_LINES=20
+      - THUMBNAIL_PATH=.temp
+    volumes:
+      - ./data/client3:/workspace/data
+      - ./.tmp/client_3:/workspace/.temp
+  client_4:
+    container_name: client_4
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile
+    entrypoint: /bin/sh -c 'while sleep 1000; do :; done'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+      - FILE_READER_LINES=20
+      - THUMBNAIL_PATH=.temp
+    volumes:
+      - ./data/client4:/workspace/data
+      - ./.tmp/client_4:/workspace/.temp
+  client_5:
+    container_name: client_5
+    build:
+      context: ./
+      dockerfile: ./client/Dockerfile
+    entrypoint: /bin/sh -c 'while sleep 1000; do :; done'
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - LOGGING_LEVEL=INFO
+      - FILE_READER_LINES=20
+      - THUMBNAIL_PATH=.temp
+    volumes:
+      - ./data/client5:/workspace/data
+      - ./.tmp/client_5:/workspace/.temp
+  acceptor:
+    container_name: acceptor
+    build:
+      context: ./
+      dockerfile: ./acceptor/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=acceptor
+      - LOGGING_LEVEL=INFO
   trending_router:
     container_name: trending_router
     build:
@@ -168,75 +264,3 @@ services:
       - SERVICE_ID=thumbnail_0
       - LOGGING_LEVEL=INFO
       - INSTANCE_NR=0
-  watcher_0:
-    container_name: watcher_0
-    build:
-      context: ./
-      dockerfile: ./watcher/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=watcher_0
-      - SERVICE_PORT=8080
-      - LOGGING_LEVEL=INFO
-      - INSTANCE_ID=0
-      - JOINER_INSTANCES=1
-      - DROPPER_INSTANCES=1
-      - TRENDING_INSTANCES=1
-      - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=1
-      - WATCHERS_INSTANCES=3
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/watcher:/workspace/config
-  watcher_1:
-    container_name: watcher_1
-    build:
-      context: ./
-      dockerfile: ./watcher/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=watcher_1
-      - SERVICE_PORT=8080
-      - LOGGING_LEVEL=INFO
-      - INSTANCE_ID=1
-      - JOINER_INSTANCES=1
-      - DROPPER_INSTANCES=1
-      - TRENDING_INSTANCES=1
-      - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=1
-      - WATCHERS_INSTANCES=3
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/watcher:/workspace/config
-  watcher_2:
-    container_name: watcher_2
-    build:
-      context: ./
-      dockerfile: ./watcher/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=watcher_2
-      - SERVICE_PORT=8080
-      - LOGGING_LEVEL=INFO
-      - INSTANCE_ID=2
-      - JOINER_INSTANCES=1
-      - DROPPER_INSTANCES=1
-      - TRENDING_INSTANCES=1
-      - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=1
-      - WATCHERS_INSTANCES=3
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/watcher:/workspace/config

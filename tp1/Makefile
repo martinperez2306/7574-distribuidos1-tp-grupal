@@ -13,29 +13,29 @@ docker-image:
 .PHONY: docker-image
 
 up: 
-	docker-compose up --build
-	make docker-compose-logs
-.PHONY: docker-compose-up
+	docker-compose up --build -d
+	make logs
+
 
 nup: 
-	docker compose up --build
-	make docker-compose-nlogs
-.PHONY: docker-compose-nup
+	docker compose up --build -d
+	make nlogs
+
 
 down:
 	docker-compose -f docker-compose.yaml stop -t 1
 	docker-compose -f docker-compose.yaml down
-.PHONY: docker-compose-down
+
 
 ndown:
 	docker compose -f docker-compose.yaml stop -t 1
 	docker compose -f docker-compose.yaml down
-.PHONY: docker-compose-ndown
+
 
 logs:
-	docker-compose logs -f
-.PHONY: docker-compose-logs
+	docker-compose logs -tf
+.PHONY: logs
 
 nlogs:
-	docker compose logs -f
-.PHONY: docker-compose-nlogs
+	docker compose logs -tf
+.PHONY: logs
