@@ -1,13 +1,31 @@
 import json
+import os.path
+import pathlib
 
 from common.constants import CATEGORY_SUBFIX
 
+STORAGE_PATH = "./storage/"
+FILE_SEPARATOR = "_"
 
 class CategoryMapper:
     def __init__(self) -> None:
         self.categories = {}
+        
 
-    def load_category_file(self, client_id: str, file_name: str, file: json):
+    def _init_client_categories(self):
+        for path in pathlib.Path(STORAGE_PATH).iterdir():
+            if path.is_file():
+                client_id = self._extract_client_from_category_file_path(path)
+                with open(path) as client_categories_file:
+                    client_categories = json.load(client_categories_file)
+                    self.categories[client_id] = client_categories
+
+    def _extract_client_from_category_file_path(path):
+        basename = str(os.path.basename(path))
+        split = basename.split(FILE_SEPARATOR)
+        return split[len(split) - 1]
+
+    def save_category_file(self, client_id: str, file_name: str, file: json):
         self.categories.setdefault(client_id, {})
         client_categories = self.categories[client_id]
 
@@ -17,6 +35,11 @@ class CategoryMapper:
 
         for el in category['items']:
             client_categories[country][el['id']] = el['snippet']['title']
+
+    def _persist_client_categories(self, client_id, client_categories):
+        file_path = STORAGE_PATH + "categories_" + client_id
+        with open(file_path, 'w') as client_category_file:
+            json.dump(client_categories, client_category_file)
 
     def len(self, client_id: str):
         return len(self.categories.get(client_id))
