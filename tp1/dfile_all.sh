@@ -1,1 +1,1 @@
-bash ./dfile_gen.sh 1 1 1 1 1 1 0 1 1 1 1 1 1
+bash ./dfile_gen.sh 6 1 1 1 1 1 0 1 1 1 1 1 1

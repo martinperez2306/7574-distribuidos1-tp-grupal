@@ -16,7 +16,7 @@ class LikesFilterMiddlware(Middleware):
                                       exchange_type='fanout')
 
         self.channel.queue_declare(
-            queue=LIKES_QUEUE)
+            queue=LIKES_QUEUE, durable=True)
 
         self.channel.queue_bind(
             exchange=DISTRIBUTION_EXCHANGE, queue=LIKES_QUEUE)

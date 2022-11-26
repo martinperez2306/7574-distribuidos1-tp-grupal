@@ -26,7 +26,7 @@ class JoinerMiddlware(Middleware):
             exchange=CATEGORIES_EXCHANGE, queue=self.categories_queue)
 
         self.channel.queue_declare(
-            queue=VIDEO_DATA_QUEUE)
+            queue=VIDEO_DATA_QUEUE, durable=True)
 
         self.channel.basic_qos(prefetch_count=30)
 

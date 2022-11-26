@@ -36,10 +36,10 @@ class ServerConnection(Worker):
         self.finish3 = False
 
     def run(self):
-        
-        self.client_id = self.register()
-
+        self.client_id = uuid.uuid4().hex
         self.middleware.recv_result_message(self.client_id, self.recv_results)
+        self.register()
+        self.middleware.consume()
         self.middleware.close_connection()
         
     def send_categories(self):
@@ -112,7 +112,7 @@ class ServerConnection(Worker):
         # First we send all the information
         
         if (MessageHandshake.is_message(message)):
-            logging.info(f'Sending Data!')
+            logging.info(f'Client Accepted {self.client_id}. Sending Data!')
             self.send_categories()
             self.send_processed_csv()
             return
@@ -183,8 +183,8 @@ class ServerConnection(Worker):
     '''
 
     def register(self):
-        client_id = uuid.uuid4().hex
-        message = MessageHandshake(client_id)
+        logging.info(f'Register Client {self.client_id}')
+        message = MessageHandshake(self.client_id)
         
         self.middleware.send_handshake_message(message.pack())
-        return client_id
+        
