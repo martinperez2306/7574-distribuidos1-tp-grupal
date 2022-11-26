@@ -13,7 +13,7 @@ class TrendingInstanceMiddlware(Middleware):
 
         self.channel.queue_declare(queue=TRENDING_TOP_QUEUE)
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
+        result = self.channel.queue_declare(queue='', durable=True)
 
         self.input_queue_name = result.method.queue
 

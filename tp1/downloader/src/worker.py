@@ -3,6 +3,7 @@ import logging
 from common.heartbeathed_worker import HeartbeathedWorker
 from common.message import EndResult2, MessageEnd, Result2, VideoMessage, BinaryFile
 from requests import get  # to make GET request
+from .model import EndResultsRepository
 
 BUFFER_SIZE = 50
 
@@ -11,7 +12,8 @@ class DownloaderInstance(HeartbeathedWorker):
     def __init__(self, middleware, instances) -> None:
         super().__init__(middleware)
         self.instances = instances
-        self.done_instances = 0
+        self.end_results = EndResultsRepository()
+        
 
     def run(self):
         self.middleware.recv_video_message(self.recv_videos)
@@ -20,15 +22,19 @@ class DownloaderInstance(HeartbeathedWorker):
 
         if MessageEnd.is_message(message):
             parsed_message = MessageEnd.decode(message)
-            logging.info(
-                f'Finish Recv Videos')
-            self.done_instances += 1
+            client_id = parsed_message.client_id
+            instance_id = parsed_message.message_id
 
-            if (self.done_instances == self.instances):
+            logging.info(
+                f'Finish Recv Videos from Incantce: {instance_id} and Client: {client_id}')
+            
+            self.end_results.add_end_result(client_id, instance_id)
+            
+
+            if (self.end_results.len_responses(client_id) == self.instances):
                 res = EndResult2(parsed_message.client_id, '')
                 self.middleware.send_result_message(res.pack())
-                self.done_instances = 0
-
+                
             return
 
         video = VideoMessage.decode(message)
@@ -50,6 +56,7 @@ class DownloaderInstance(HeartbeathedWorker):
         except ValueError:
             logging.error(
                 f'Incorrect formatted value {video.content}')
+    
 
     def send_thumbnail(self, client_id, file_name, content):
         index = 0
@@ -62,7 +69,9 @@ class DownloaderInstance(HeartbeathedWorker):
 
             msg_content = BinaryFile(
                 file_name, content[index:next_index])
-            res = Result2(client_id, str(index), msg_content.pack())
+            message_id = file_name + '#' + str(index)
+            
+            res = Result2(client_id, message_id, msg_content.pack())
             self.middleware.send_result_message(res.pack())
 
             index = next_index

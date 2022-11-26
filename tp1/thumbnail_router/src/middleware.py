@@ -14,7 +14,7 @@ class ThumbnailRouterMiddlware(Middleware):
         self.channel.exchange_declare(exchange=THUMBNAIL_EXCHANGE,
                                       exchange_type='direct')
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
+        result = self.channel.queue_declare(queue='', durable=True)
 
         self.input_queue_name = result.method.queue
 

@@ -4,7 +4,7 @@ import logging
 import os
 import uuid
 
-from common.message import EndResult1, EndResult2, EndResult3, FileMessage, MessageEnd, Result1, Result2, Result3, BinaryFile
+from common.message import EndResult1, EndResult2, EndResult3, FileMessage, MessageEnd, Result1, Result2, Result3, BinaryFile, MessageHandshake
 from common.worker import Worker
 from common.utils import uid
 
@@ -36,17 +36,13 @@ class ServerConnection(Worker):
         self.finish3 = False
 
     def run(self):
-        self.register()
+        
+        self.client_id = self.register()
 
-        self.send_categories()
-
-        self.send_processed_csv()
-
-        self.middleware.recv_result_message(self.recv_results)
+        self.middleware.recv_result_message(self.client_id, self.recv_results)
         self.middleware.close_connection()
         
     def send_categories(self):
-        print(self.client_id)
 
         for file_name in self.category_files:
             logging.info(f'Sending Category File: {file_name}')
@@ -113,6 +109,14 @@ class ServerConnection(Worker):
                 return counter
 
     def recv_results(self, message):
+        # First we send all the information
+        
+        if (MessageHandshake.is_message(message)):
+            logging.info(f'Sending Data!')
+            self.send_categories()
+            self.send_processed_csv()
+            return
+
         if self.is_end_result(message):
             logging.info(f'Recv All Responses!')
             self.middleware.stop_recv_result_message()
@@ -179,4 +183,8 @@ class ServerConnection(Worker):
     '''
 
     def register(self):
-        self.client_id = uuid.uuid4().hex
+        client_id = uuid.uuid4().hex
+        message = MessageHandshake(client_id)
+        
+        self.middleware.send_handshake_message(message.pack())
+        return client_id

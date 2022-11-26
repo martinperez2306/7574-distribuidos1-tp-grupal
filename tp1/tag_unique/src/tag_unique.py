@@ -2,12 +2,12 @@ import logging
 
 from common.heartbeathed_worker import HeartbeathedWorker
 from common.message import EndResult1, MessageEnd, Result1, VideoMessage
-
+from .model import ResultRepository
 
 class TagUnique(HeartbeathedWorker):
     def __init__(self, middleware) -> None:
         super().__init__(middleware)
-        self.items = set()
+        self.repository = ResultRepository()
 
     def run(self):
         self.middleware.recv_video_message(self.recv_videos)
@@ -23,7 +23,7 @@ class TagUnique(HeartbeathedWorker):
             return
 
         video = VideoMessage.decode(message)
-
+        client_id = video.client_id
         try:
             tags = video.content['tags']
             # print(f'Is funny: {'funny' in tags}')
@@ -31,12 +31,12 @@ class TagUnique(HeartbeathedWorker):
                     video.content['title'], video.content['category'])
 
             logging.info(item)
-            if (tags != None and 'funny' in tags and not item in self.items):
-                self.items.add(item)
+            if (tags != None and 'funny' in tags and not self.repository.check_element(client_id, item)):
                 end_message = Result1(video.client_id, video.message_id, ",".join(item))
                 self.middleware.send_result_message(end_message.pack())
+                self.repository.add_element(client_id, item)
 
-                # self.middleware.send_video_message(message)
+                
         except KeyError:
             logging.error(
                 f'Key tags not found in {video.content}')

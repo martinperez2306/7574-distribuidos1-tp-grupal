@@ -12,9 +12,9 @@ class TagUniqueMiddlware(Middleware):
                                       exchange_type='fanout')
 
         self.channel.queue_declare(
-            queue=RESULTS_QUEUE)
+            queue=RESULTS_QUEUE, durable=True)
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
+        result = self.channel.queue_declare(queue='', durable=True)
 
         self.input_queue_name = result.method.queue
 

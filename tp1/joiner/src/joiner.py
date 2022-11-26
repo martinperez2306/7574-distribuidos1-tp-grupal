@@ -13,18 +13,18 @@ class Joiner(HeartbeathedWorker):
     def run(self):
         self.middleware.recv_category_message(self.recv_categories)
         self.middleware.recv_video_message(self.recv_videos)
+        self.middleware.consume()
 
     def recv_categories(self, message):
         logging.info('New category message')
 
         if MessageEnd.is_message(message):
-            logging.info(
-                f'Finish Recv Categories, recv {self.categories.len()} countries')
             parsed_message = MessageEnd.decode(message)
-            message = CategoryMessage(parsed_message.client_id, self.categories.len())
+            logging.info(
+                f'Finish Recv Categories, recv {self.categories.len(parsed_message.client_id)} countries for {parsed_message.client_id}')
+            message = CategoryMessage(parsed_message.client_id, self.categories.len(parsed_message.client_id))
             self.middleware.send_category_count(message.pack())
 
-            self.middleware.stop_recv_category_message()
             return
 
         if not FileMessage.is_message(message):
@@ -33,7 +33,7 @@ class Joiner(HeartbeathedWorker):
 
         file_message = FileMessage.decode(message)
 
-        self.categories.load_category_file(
+        self.categories.load_category_file(file_message.client_id, 
             file_message.file_name, file_message.file_content)
 
     def recv_videos(self, message):
@@ -49,7 +49,7 @@ class Joiner(HeartbeathedWorker):
         video = VideoMessage.decode(message)
 
         try:
-            category_name = self.categories.map_category(
+            category_name = self.categories.map_category(video.client_id, 
                 video.content['country'], video.content['categoryId'])
             video.content.pop('categoryId')
             video.content['category'] = category_name
@@ -57,5 +57,3 @@ class Joiner(HeartbeathedWorker):
         except KeyError as err:
             logging.debug(f'Invalid key error: {err}')
 
-    def category_len(self):
-        len(self.categories)

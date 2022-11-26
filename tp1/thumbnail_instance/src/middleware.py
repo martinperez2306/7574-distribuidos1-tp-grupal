@@ -17,7 +17,7 @@ class ThumbnailInstanceMiddlware(Middleware):
 
         self.channel.queue_declare(queue=DOWNLOAD_QUEUE)
 
-        result = self.channel.queue_declare(queue='', exclusive=True)
+        result = self.channel.queue_declare(queue='', durable=True)
 
         self.input_queue_name = result.method.queue
 
@@ -32,7 +32,7 @@ class ThumbnailInstanceMiddlware(Middleware):
             exchange=CATEGORIES_COUNT_EXCHANGE, queue=category_count.method.queue, routing_key='')
 
         self.cat_count_tag = super().recv_message(category_count.method.queue, callback)
-        self.channel.start_consuming()
+        
 
     def stop_recv_category_count(self):
         super().stop_recv_message(consumer_tag=self.cat_count_tag)
@@ -41,7 +41,6 @@ class ThumbnailInstanceMiddlware(Middleware):
 
         self.vid_msg_tag = super().recv_message(self.input_queue_name, callback)
 
-        self.channel.start_consuming()
 
     def send_result_message(self, message):
 
