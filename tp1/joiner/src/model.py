@@ -25,7 +25,7 @@ class CategoryMapper:
         split = basename.split(FILE_SEPARATOR)
         return split[len(split) - 1]
 
-    def save_category_file(self, client_id: str, file_name: str, file: json):
+    def load_category_file(self, client_id: str, file_name: str, file: json):
         self.categories.setdefault(client_id, {})
         client_categories = self.categories[client_id]
 
@@ -35,6 +35,8 @@ class CategoryMapper:
 
         for el in category['items']:
             client_categories[country][el['id']] = el['snippet']['title']
+
+        self._persist_client_categories(client_id, client_categories)
 
     def _persist_client_categories(self, client_id, client_categories):
         file_path = STORAGE_PATH + "categories_" + client_id

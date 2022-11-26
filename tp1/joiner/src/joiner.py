@@ -33,7 +33,7 @@ class Joiner(HeartbeathedWorker):
 
         file_message = FileMessage.decode(message)
 
-        self.categories.save_category_file(file_message.client_id, 
+        self.categories.load_category_file(file_message.client_id, 
             file_message.file_name, file_message.file_content)
 
     def recv_videos(self, message):
