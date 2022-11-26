@@ -12,13 +12,13 @@ class HearthbeatJob():
     def __init__(self) -> None:
         self.process = Process(target=self.run)
         self.running = True
-        self.id =  os.environ['SERVICE_ID']
+        self.id = os.environ['SERVICE_ID']
 
     def start(self):
         self.process.start()
 
     def run(self):
-        
+
         self.middleware = HeartbeatMiddleware(self.id)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
         signal.signal(signal.SIGINT, self.exit_gracefully)
@@ -35,5 +35,5 @@ class HearthbeatJob():
         logging.info("Exiting Heartbeat Job")
         self.running = False
 
-    def stop(self):
+    # def stop(self):
         self.process.terminate()

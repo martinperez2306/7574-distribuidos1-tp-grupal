@@ -8,10 +8,10 @@ class DropperMiddlware(Middleware):
     def __init__(self) -> None:
         super().__init__()
         self.channel.queue_declare(
-            queue=DROPPER_INPUT_QUEUE)
+            queue=DROPPER_INPUT_QUEUE, durable=True)
 
         self.channel.queue_declare(
-            queue=VIDEO_DATA_QUEUE)
+            queue=VIDEO_DATA_QUEUE, durable=True)
         self.channel.basic_qos(prefetch_count=30)
 
     def recv_video_message(self, callback):

@@ -33,9 +33,7 @@ services:
       test: ['CMD', 'curl', '-f', 'http://localhost:15672']
       interval: 10s
       timeout: 5s
-      retries: 5
-    logging:
-      driver: none"
+      retries: 5"
 
 for (( i = 0; i < $REPLICAS_CLIENT; i++ )) 
 do
@@ -56,7 +54,7 @@ do
       - THUMBNAIL_PATH=.temp
     volumes:
       - ./data/client${i}:/workspace/data
-      - ./.temp${i}:/workspace/.temp"
+      - ./.tmp/client_${i}:/workspace/.temp"
   BASE+="${CLIENT_INSTANCE}"
 done
 

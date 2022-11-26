@@ -35,7 +35,7 @@ class ThumbnailInstance(HeartbeathedWorker):
             decoded_message.message_id = self.id
 
             logging.info(
-                f'Finish Grouping Videos for Client: {decoded_message.client_id}')
+                f'Finish Thumbnail Grouping Videos for Client: {decoded_message.client_id}')
             self.middleware.send_result_message(decoded_message.pack())
             return
             
@@ -53,8 +53,7 @@ class ThumbnailInstance(HeartbeathedWorker):
             if (completed):
                 self.middleware.send_result_message(message)
 
-                logging.info(
-                    f'Tenemos 21 y 11 paises: {video_id}')
+                
                 return
 
         except KeyError:
