@@ -20,18 +20,19 @@ class ResultRepository():
                         self._load_item_from_file(item_str)
                     
     def _load_item_from_file(self, item_str: str):
-        item_split = item_str.split(ELEMENT_SEPARATOR)
+        item_split = item_str.strip().split(ELEMENT_SEPARATOR)
         client_id = item_split[0]
         video_id = item_split[1]
-        title = [item_split[2]]
-        category = [item_split[3]]
+        title = item_split[2]
+        category = item_split[3]
         item = (video_id, title, category)
         if not self.check_element(client_id, item):
-            self.add_element(client_id, item)
+            self.add_element(client_id, item, False)
 
-    def add_element(self, client_id, element):
+    def add_element(self, client_id, element, persist):
         self.items[client_id].add(element)
-        self._persist_element(client_id, element)
+        if persist:
+            self._persist_element(client_id, element)
 
     def check_element(self, client_id, element):
         self.items.setdefault(client_id, set())

@@ -32,7 +32,7 @@ class TagUnique(HeartbeathedWorker):
             if (tags != None and 'funny' in tags and not self.repository.check_element(client_id, item)):
                 end_message = Result1(video.client_id, video.message_id, ",".join(item))
                 self.middleware.send_result_message(end_message.pack())
-                self.repository.add_element(client_id, item)
+                self.repository.add_element(client_id, item, True)
 
                 
         except KeyError:
