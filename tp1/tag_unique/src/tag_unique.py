@@ -36,5 +36,4 @@ class TagUnique(HeartbeathedWorker):
 
                 
         except KeyError:
-            logging.error(
-                f'Key tags not found in {video.content}')
+            logging.error(f'Key tags not found in {video.content}')
