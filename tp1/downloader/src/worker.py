@@ -26,12 +26,13 @@ class DownloaderInstance(HeartbeathedWorker):
             instance_id = parsed_message.message_id
 
             logging.info(
-                f'Finish Recv Videos from Incantce: {instance_id} and Client: {client_id}')
+                f'Finish Recv Videos from Instance: {instance_id} and Client: {client_id}')
             
             self.end_results.add_end_result(client_id, instance_id)
             
-
             if (self.end_results.len_responses(client_id) == self.instances):
+                logging.info(
+                f'Finish Recv Videos from all instances. Client: {client_id}')
                 res = EndResult2(parsed_message.client_id, '')
                 self.middleware.send_result_message(res.pack())
                 

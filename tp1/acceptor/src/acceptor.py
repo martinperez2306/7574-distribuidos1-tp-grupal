@@ -51,15 +51,22 @@ class Acceptor(HeartbeathedWorker):
         if (EndResult3.is_message(message)):
             end_result = 3
 
-        if (end_result is not None):
-            self.clients.save_result(client_id, end_result)
+        try:
 
-        self.middleware.send_result(client_id, message)
+            if (end_result is not None):
+                self.clients.save_result(client_id, end_result)
 
-        if (self.clients.is_client_finished(client_id)):
-            if (self.clients.len() == MAX_CLIENTS):
-                logging.info(f'Start Accepting Clients Again')
-                self.middleware.recv_client_messages(self.on_client_message)
+            self.middleware.send_result(client_id, message)
 
-            logging.info(f'Remove client ID {client_id}')
-            self.clients.remove_client(client_id)
+            if (self.clients.is_client_finished(client_id)):
+                if (self.clients.len() == MAX_CLIENTS):
+                    logging.info(f'Start Accepting Clients Again')
+                    self.middleware.recv_client_messages(
+                        self.on_client_message)
+
+                logging.info(f'Remove client ID {client_id}')
+                self.clients.remove_client(client_id)
+
+        except KeyError:
+            logging.error(
+                f'Client not found for message {message}')
