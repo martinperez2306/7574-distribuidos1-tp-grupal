@@ -1,11 +1,14 @@
-import sys
+from multiprocessing import current_process
+import os
+import signal
+
 class ManualChaos:
     def __init__(self) -> None:
         pass
 
-    @staticmethod
-    def chaos():
+    def chaos(self):
         print("Break now? Y/n\n")
         chaos = input()
         if chaos == "Y":
-            sys.exit(1)
+            process = current_process()
+            os.kill(process.pid, signal.SIGTERM)
