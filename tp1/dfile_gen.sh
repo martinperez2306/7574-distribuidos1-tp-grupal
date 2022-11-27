@@ -156,7 +156,9 @@ then
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=tag_unique
-      - LOGGING_LEVEL=INFO"
+      - LOGGING_LEVEL=INFO
+    volumes:
+      - ./storage/tag_unique:/workspace/storage"
   
   BASE+="${TAG_UNIQUE_INSTANCE}"
 fi
