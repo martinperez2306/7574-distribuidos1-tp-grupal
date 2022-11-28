@@ -15,8 +15,7 @@ class TagUnique(HeartbeathedWorker):
     def recv_videos(self, message):
 
         if MessageEnd.is_message(message):
-            logging.info(
-                f'Finish Recv Videos')
+            logging.info(f'Finish Recv Videos')
             parsed_message = MessageEnd.decode(message)
             end_message = EndResult1(parsed_message.client_id, '1')
             self.middleware.send_result_message(end_message.pack())
@@ -33,9 +32,8 @@ class TagUnique(HeartbeathedWorker):
             if (tags != None and 'funny' in tags and not self.repository.check_element(client_id, item)):
                 end_message = Result1(video.client_id, video.message_id, ",".join(item))
                 self.middleware.send_result_message(end_message.pack())
-                self.repository.add_element(client_id, item)
+                self.repository.add_element(client_id, item, True)
 
                 
         except KeyError:
-            logging.error(
-                f'Key tags not found in {video.content}')
+            logging.error(f'Key tags not found in {video.content}')
