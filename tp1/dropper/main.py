@@ -13,8 +13,10 @@ def main():
     # of the component
     logging.info("Dropper starting work")
 
+    instance_n = os.getenv("INSTANCE_NR") or '0'
+
     # Initialize server and start server loop
-    middleware = DropperMiddlware()
+    middleware = DropperMiddlware(instance_n)
     worker = Dropper(middleware)
 
     worker.start()

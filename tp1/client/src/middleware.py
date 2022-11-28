@@ -1,23 +1,35 @@
 from common.middleware import Middleware
+import os 
+import logging
 
 CATEGORIES_EXCHANGE = 'categories_exchange'
-DROPPER_INPUT_QUEUE = 'dropper_input'
+INPUT_EXCHANGE = 'input_exchange'
 CLIENT_ACCEPT_QUEUE = 'client_accept'
 
 
 class ClientMiddleware(Middleware):
     def __init__(self) -> None:
         super().__init__()
+        
+        self.nr_output_instances = int(os.environ['OUTPUT_INSTANCES'])
+        
         self.channel.exchange_declare(exchange=CATEGORIES_EXCHANGE,
                                       exchange_type='fanout')
-        self.channel.queue_declare(
-            queue=DROPPER_INPUT_QUEUE, durable=True)
+        
+        self.channel.exchange_declare(exchange=INPUT_EXCHANGE,
+                                      exchange_type='direct')
 
     def send_category_message(self, message):
         super().send_to_exchange(CATEGORIES_EXCHANGE, '', message)
 
-    def send_video_message(self, message):
-        super().send_message(DROPPER_INPUT_QUEUE, message)
+    def send_video_message(self, message, message_id):
+        instance_nr = hash(message_id) % self.nr_output_instances
+        
+        super().send_to_exchange(INPUT_EXCHANGE, str(instance_nr), message)
+
+    def send_end_message(self, message):
+        logging.info(f'Send end message {message}')
+        super().send_to_exchange(INPUT_EXCHANGE,'end', message)
 
     def send_handshake_message(self, message):
         super().send_message(CLIENT_ACCEPT_QUEUE, message)

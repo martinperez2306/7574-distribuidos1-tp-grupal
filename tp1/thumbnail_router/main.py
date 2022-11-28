@@ -15,9 +15,10 @@ def main():
 
     instances = int(os.getenv("INSTANCES")) or 1
 
+    prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
     # Initialize server and start server loop
     middleware = ThumbnailRouterMiddlware()
-    worker = ThumbnailRouter(middleware, instances)
+    worker = ThumbnailRouter(middleware, instances, prev_pipeline_instances)
 
     worker.start()
 

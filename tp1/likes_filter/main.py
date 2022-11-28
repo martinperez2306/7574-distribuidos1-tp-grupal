@@ -14,9 +14,11 @@ def main():
     logging.info("Likes Filter starting work")
 
     filter_qty = int(os.getenv("FILTER_QTY"))
+    prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
+    
     # Initialize server and start server loop
     middleware = LikesFilterMiddlware()
-    worker = LikesFilter(middleware, filter_qty)
+    worker = LikesFilter(middleware, filter_qty, prev_pipeline_instances)
 
     worker.start()
 

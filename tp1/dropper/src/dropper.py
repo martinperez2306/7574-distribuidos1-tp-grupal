@@ -18,7 +18,10 @@ class Dropper(HeartbeathedWorker):
         if MessageEnd.is_message(message):
             logging.info(
                 f'Finish Recv Video Files')
-            self.middleware.send_video_message(message)
+            parsed_message = MessageEnd.decode(message)
+            parsed_message.message_id = self.id
+
+            self.middleware.send_end_message(parsed_message.pack())
             return
 
         if not FileMessage.is_message(message):
@@ -45,7 +48,7 @@ class Dropper(HeartbeathedWorker):
             logging.debug(f'Proccessed message with id: {message_id}')
 
             message = VideoMessage(file_message.client_id, message_id, dropped)
-            self.middleware.send_video_message(message.pack())
+            self.middleware.send_video_message(message.pack(), message.message_id)
 
         f.close()
         # self.middleware.send_video_message(message.pack())

@@ -13,9 +13,11 @@ def main():
     # of the component
     logging.info("Jointer starting work")
 
+    prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
+    instance_n = os.getenv("INSTANCE_NR") or '0'
     # Initialize server and start server loop
-    middleware = JoinerMiddlware()
-    worker = Joiner(middleware)
+    middleware = JoinerMiddlware(instance_n)
+    worker = Joiner(middleware, prev_pipeline_instances)
 
     worker.start()
 

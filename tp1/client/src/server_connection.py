@@ -79,14 +79,15 @@ class ServerConnection(Worker):
                     f.seek(0)
 
                     counter += 1
+                    message_id = uid()
                     message = FileMessage(
-                        self.client_id, uid(), file_name, f.read())
-                    self.middleware.send_video_message(message.pack())
+                        self.client_id, message_id, file_name, f.read())
+                    self.middleware.send_video_message(message.pack(), message_id)
 
                 logging.info(
                     f'Sending Raw Data File: {file_name}')
 
-        self.middleware.send_video_message(
+        self.middleware.send_end_message(
             MessageEnd(self.client_id, uid()).pack())
 
     def get_next_file_slice(self, f, csv_reader, header) -> bool:

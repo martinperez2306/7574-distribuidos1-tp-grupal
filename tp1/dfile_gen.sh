@@ -52,6 +52,7 @@ do
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
+      - OUTPUT_INSTANCES=${REPLICAS_DROPPER}
     volumes:
       - ./data/client${i}:/workspace/data
       - ./.tmp/client_${i}:/workspace/.temp"
@@ -115,6 +116,7 @@ then
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=thumbnail_router
       - LOGGING_LEVEL=INFO
+      - N_PREV_WORKER_INSTANCES=${REPLICAS_JOINER}
       - INSTANCES=${REPLICAS_THUMBNAIL}"
   
   BASE+="${THUMBNAIL_ROUTER_INSTANCE}"
@@ -198,7 +200,9 @@ do
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
+      - N_PREV_WORKER_INSTANCES=${REPLICAS_DROPPER}
       - SERVICE_ID=joiner_${i}
+      - INSTANCE_NR=${i}
       - LOGGING_LEVEL=INFO"
 
   BASE+="${JOINER_INSTANCE}"
@@ -220,7 +224,9 @@ do
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=dropper_${i}
-      - LOGGING_LEVEL=INFO"
+      - LOGGING_LEVEL=INFO
+      - OUTPUT_INSTANCES=${REPLICAS_JOINER}
+      - INSTANCE_NR=${i}"
 
   BASE+="${DROPPER_INSTANCE}"
 done
@@ -242,6 +248,7 @@ do
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - LOGGING_LEVEL=INFO
       - SERVICE_ID=like_filter_${i}
+      - N_PREV_WORKER_INSTANCES=${REPLICAS_JOINER}
       - FILTER_QTY=${FILTER_QTY}"
 
   BASE+="${LIKE_FILTER_INSTANCE}"
