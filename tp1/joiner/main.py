@@ -12,6 +12,7 @@ def main():
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
     logging.info("Jointer starting work")
+    logging.getLogger("pika").setLevel(logging.ERROR)
 
     prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
     instance_n = os.getenv("INSTANCE_NR") or '0'
@@ -21,8 +22,7 @@ def main():
 
     worker.start()
 
-    logging.info(
-        'Bye bye!')
+    logging.info('Bye bye!')
 
 
 def initialize_log(logging_level):
