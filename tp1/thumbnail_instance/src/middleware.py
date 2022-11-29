@@ -36,15 +36,11 @@ class ThumbnailInstanceMiddlware(Middleware):
     def recv_category_count(self, callback):
         self.cat_count_tag = super().recv_message(self.category_count_input, callback)
         
-
     def stop_recv_category_count(self):
         super().stop_recv_message(consumer_tag=self.cat_count_tag)
 
-    def recv_video_message(self, callback):
-
-        self.vid_msg_tag = super().recv_message(self.recv_queue, callback)
-
+    def recv_video_message(self, callback):\
+        self.vid_msg_tag = super().recv_batch_message(self.recv_queue, callback)
 
     def send_result_message(self, message):
-
         super().send_message(DOWNLOAD_QUEUE, message)
