@@ -1,6 +1,7 @@
 import logging
 
 MIN_PERIOD_IN_DAYS = 21
+STORAGE_PATH = "./storage/"
 
 # video_ids
 # {
@@ -55,6 +56,9 @@ class ThumbnailGrouper:
             return True
 
         return False
+
+    def persist_data(self):
+        pass
 
         # # If we have the validated ID we return
         # if (os.path.exists(validated_id)):

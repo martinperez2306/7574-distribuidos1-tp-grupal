@@ -58,6 +58,7 @@ class ThumbnailInstance(HeartbeathedWorker):
                 return send_ack_flag
 
             if (self.batch_size == self.message_count):
+                self.grouper.persist_data()
                 self.message_count = 0
                 send_ack_flag = True
 
