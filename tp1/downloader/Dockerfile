@@ -2,9 +2,11 @@ FROM python:3.9.7-slim
 
 WORKDIR /workspace
 
+
 COPY ./downloader/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 COPY ./downloader .
 COPY ./common ./common
 
+RUN mkdir storage
 ENTRYPOINT ["/bin/sh"]

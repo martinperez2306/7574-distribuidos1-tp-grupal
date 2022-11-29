@@ -189,6 +189,7 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=tag_unique
       - LOGGING_LEVEL=INFO
+    
   trending_top:
     container_name: trending_top
     build:
@@ -218,6 +219,7 @@ services:
       - SERVICE_ID=joiner_0
       - INSTANCE_NR=0
       - LOGGING_LEVEL=INFO
+    
   joiner_1:
     container_name: joiner_1
     build:
@@ -233,6 +235,7 @@ services:
       - SERVICE_ID=joiner_1
       - INSTANCE_NR=1
       - LOGGING_LEVEL=INFO
+    
   dropper_0:
     container_name: dropper_0
     build:

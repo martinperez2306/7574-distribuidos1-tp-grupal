@@ -6,5 +6,5 @@ COPY ./thumbnail_router/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 COPY ./thumbnail_router .
 COPY ./common ./common
-
+RUN mkdir storage
 ENTRYPOINT ["/bin/sh"]
