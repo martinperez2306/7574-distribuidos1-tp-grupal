@@ -59,13 +59,11 @@ class ThumbnailInstance(HeartbeathedWorker):
 
             if (self.batch_size == self.message_count):
                 self.grouper.persist_data()
-                self.message_count = 0
+                self.message_count = 0 
                 send_ack_flag = True
-
+                                     
             return send_ack_flag
 
         except KeyError:
             logging.error(f'Key tags not found in {video.content}')
             return False
-
-    
