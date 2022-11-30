@@ -113,7 +113,7 @@ class ServerConnection(Worker):
         # First we send all the information
         
         if (MessageHandshake.is_message(message)):
-            logging.info(f'Client Accepted {self.client_id}. Sending Data!')
+            logging.info(f'Client Accepted. Sending Data!')
             self.send_categories()
             self.send_processed_csv()
             return
@@ -184,7 +184,7 @@ class ServerConnection(Worker):
     '''
 
     def register(self):
-        logging.info(f'Register Client {self.client_id}')
+        logging.info(f'Register Client')
         message = MessageHandshake(self.client_id)
         
         self.middleware.send_handshake_message(message.pack())

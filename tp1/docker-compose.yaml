@@ -337,3 +337,27 @@ services:
       - SERVICE_ID=thumbnail_1
       - LOGGING_LEVEL=INFO
       - INSTANCE_NR=1
+  watcher_0:
+    container_name: watcher_0
+    build:
+      context: ./
+      dockerfile: ./watcher/Dockerfile
+    entrypoint: python3 main.py
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - RABBIT_SERVER_ADDRESS=rabbitmq
+      - SERVICE_ID=watcher_0
+      - SERVICE_PORT=8080
+      - LOGGING_LEVEL=INFO
+      - INSTANCE_ID=0
+      - JOINER_INSTANCES=2
+      - DROPPER_INSTANCES=2
+      - TRENDING_INSTANCES=2
+      - LIKE_FILTER_INSTANCES=1
+      - THUMBNAIL_INSTANCES=2
+      - WATCHERS_INSTANCES=1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/watcher:/workspace/config

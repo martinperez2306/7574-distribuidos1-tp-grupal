@@ -5,6 +5,7 @@ from common.message import MessageEnd, Result3, VideoMessage
 from datetime import datetime
 from .model import Grouper
 
+
 class TrendingInstance(HeartbeathedWorker):
     def __init__(self, middleware) -> None:
         super().__init__(middleware)
@@ -34,8 +35,9 @@ class TrendingInstance(HeartbeathedWorker):
 
                 views = int(video.content['view_count'])
                 client_id = video.client_id
+                message_id = video.message_id
 
-                self.grouper.add_value(client_id, date, views)
+                self.grouper.add_value(client_id, message_id, date, views)
 
         except KeyError:
             logging.error(
@@ -52,7 +54,3 @@ class TrendingInstance(HeartbeathedWorker):
         self.middleware.send_result_message(result.pack())
 
         return
-
-    
-
-        
