@@ -24,7 +24,7 @@ class ThumbnailInstance(HeartbeathedWorker):
             client_id = message.client_id
 
             self.grouper.add_country_count(client_id, int(message.content))
-
+            self.grouper.persist_country_count()
             logging.info(f'Finish Recv Category Count: {message.content}')
                 
     def recv_videos(self, message):

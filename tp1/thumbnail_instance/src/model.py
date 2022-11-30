@@ -1,8 +1,10 @@
 import logging
 import json
+import pathlib
 
 MIN_PERIOD_IN_DAYS = 21
 STORAGE_PATH = "./storage/"
+FILE_SEPARATOR = "_"
 
 # video_ids
 # {
@@ -24,6 +26,15 @@ class ThumbnailGrouper:
         self.video_countries = {}
         self.country_count = {}
         self.processed = {}
+
+    def _init_client_categories(self):
+        for path in pathlib.Path(STORAGE_PATH).iterdir():
+            if path.is_file():
+                client_id = self._extract_client_from_category_file_path(path)
+                if self._is_category_file(path):
+                    with open(path) as client_categories_file:
+                        client_categories = json.load(client_categories_file)
+                        self.categories[client_id] = client_categories
 
     def add_country_count(self, client_id, country_count):
         self.country_count[client_id] = country_count
@@ -88,13 +99,19 @@ class ThumbnailGrouper:
         #     views = int(video.content['view_count'])
         #     self.group_date(date, views)
 
-    def persist_data(self):
-        data = {
-            "video_ids": self.video_ids,
-            "video_countries": self.video_countries,
-            "country_count": self.country_count,
-            "processed": self.processed
-        }
-        file_path = STORAGE_PATH + "thumbnail_backup"
+    def persist_country_count(self):
+        data = self.country_count
+        file_path = STORAGE_PATH + "thumbnail_country_count_backup"
         with open(file_path, 'w') as thumbnail_file:
             json.dump(data, thumbnail_file)
+
+    def persist_data(self):
+        for client_id in self.video_ids:
+            client_data = {
+                "video_ids": self.video_ids[client_id],
+                "video_countries": self.video_countries[client_id],
+                "processed": self.processed[client_id]
+            }
+            file_path = STORAGE_PATH + client_id + FILE_SEPARATOR + "thumbnail_backup"
+            with open(file_path, 'w') as thumbnail_file:
+                json.dump(client_data, thumbnail_file)
