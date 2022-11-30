@@ -1,4 +1,5 @@
 import logging
+import json
 
 MIN_PERIOD_IN_DAYS = 21
 STORAGE_PATH = "./storage/"
@@ -57,9 +58,6 @@ class ThumbnailGrouper:
 
         return False
 
-    def persist_data(self):
-        pass
-
         # # If we have the validated ID we return
         # if (os.path.exists(validated_id)):
         #     return
@@ -89,3 +87,14 @@ class ThumbnailGrouper:
 
         #     views = int(video.content['view_count'])
         #     self.group_date(date, views)
+
+    def persist_data(self):
+        data = {
+            "video_ids": self.video_ids,
+            "video_countries": self.video_countries,
+            "country_count": self.country_count,
+            "processed": self.processed
+        }
+        file_path = STORAGE_PATH + "thumbnail_backup"
+        with open(file_path, 'w') as thumbnail_file:
+            json.dump(data, thumbnail_file)

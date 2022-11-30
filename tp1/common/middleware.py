@@ -49,4 +49,4 @@ class Middleware():
         send_ack_flag = callback(body)
         if send_ack_flag:
             ch.basic_ack(delivery_tag=method.delivery_tag, multiple=True)
-            
+        
