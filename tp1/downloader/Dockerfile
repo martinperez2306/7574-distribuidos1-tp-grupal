@@ -5,8 +5,8 @@ WORKDIR /workspace
 
 COPY ./downloader/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
+RUN mkdir storage
 COPY ./downloader .
 COPY ./common ./common
 
-RUN mkdir storage
 ENTRYPOINT ["/bin/sh"]

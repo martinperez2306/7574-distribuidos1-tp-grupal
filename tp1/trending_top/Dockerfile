@@ -4,7 +4,8 @@ WORKDIR /workspace
 
 COPY ./trending_top/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
+RUN mkdir storage
 COPY ./trending_top .
 COPY ./common ./common
-RUN mkdir storage
+
 ENTRYPOINT ["/bin/sh"]

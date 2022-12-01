@@ -12,7 +12,8 @@ def main():
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
     logging.info("Thumbnail Instance starting work")
-
+    logging.getLogger("pika").setLevel(logging.ERROR)
+    
     instance_n = os.getenv("INSTANCE_NR") or '0'
 
     # Initialize server and start server loop
@@ -21,8 +22,7 @@ def main():
 
     worker.start()
 
-    logging.info(
-        'Bye bye!')
+    logging.info('Bye bye!')
 
 
 def initialize_log(logging_level):
