@@ -1,10 +1,13 @@
 import logging
 import json
+import os
 import pathlib
 
 MIN_PERIOD_IN_DAYS = 21
 STORAGE_PATH = "./storage/"
 FILE_SEPARATOR = "_"
+COUNTRY_COUNT_FILE = "country_count"
+THUMBNAIL_GROUPER_PREFIX = "thumbnail_grouper"
 
 # video_ids
 # {
@@ -26,15 +29,36 @@ class ThumbnailGrouper:
         self.video_countries = {}
         self.country_count = {}
         self.processed = {}
+        self._init_data()
 
-    def _init_client_categories(self):
+    def _init_data(self):
         for path in pathlib.Path(STORAGE_PATH).iterdir():
             if path.is_file():
-                client_id = self._extract_client_from_category_file_path(path)
-                if self._is_category_file(path):
-                    with open(path) as client_categories_file:
-                        client_categories = json.load(client_categories_file)
-                        self.categories[client_id] = client_categories
+                if self._is_country_count_file(path):
+                    with open(path) as country_count_file:
+                        self.country_count = json.load(country_count_file)
+                elif self._is_thumbnail_group_file(path):
+                    with open(path) as thumbnail_grouper_file:
+                        client_id = self._extract_client_from_category_file_path(path)
+                        data = json.load(thumbnail_grouper_file)
+                        self.video_ids[client_id] = data.video_ids
+                        self.video_countries[client_id] = data.video_countries
+                        self.processed[client_id] = data.processed
+
+    
+    def _is_country_count_file(self, path):
+        basename = str(os.path.basename(path))
+        return COUNTRY_COUNT_FILE == basename
+
+    def _is_thumbnail_group_file(self, path):
+        basename = str(os.path.basename(path))
+        split = basename.split(FILE_SEPARATOR)
+        return THUMBNAIL_GROUPER_PREFIX == split[0]
+
+    def _extract_client_from_category_file_path(self, path):
+        basename = str(os.path.basename(path))
+        split = basename.split(FILE_SEPARATOR)
+        return split[len(split) - 1]
 
     def add_country_count(self, client_id, country_count):
         self.country_count[client_id] = country_count
@@ -101,9 +125,9 @@ class ThumbnailGrouper:
 
     def persist_country_count(self):
         data = self.country_count
-        file_path = STORAGE_PATH + "thumbnail_country_count_backup"
-        with open(file_path, 'w') as thumbnail_file:
-            json.dump(data, thumbnail_file)
+        file_path = STORAGE_PATH + COUNTRY_COUNT_FILE
+        with open(file_path, 'w') as country_count_file:
+            json.dump(data, country_count_file)
 
     def persist_data(self):
         for client_id in self.video_ids:
@@ -112,6 +136,6 @@ class ThumbnailGrouper:
                 "video_countries": self.video_countries[client_id],
                 "processed": self.processed[client_id]
             }
-            file_path = STORAGE_PATH + client_id + FILE_SEPARATOR + "thumbnail_backup"
-            with open(file_path, 'w') as thumbnail_file:
-                json.dump(client_data, thumbnail_file)
+            file_path = STORAGE_PATH + THUMBNAIL_GROUPER_PREFIX + FILE_SEPARATOR + client_id
+            with open(file_path, 'w') as thumbnail_grouper_file:
+                json.dump(client_data, thumbnail_grouper_file)

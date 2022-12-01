@@ -5,7 +5,7 @@ import pathlib
 from common.constants import CATEGORY_SUBFIX
 
 STORAGE_PATH = "./storage/"
-CATEGORY_PREFIX = "categories_"
+CATEGORY_PREFIX = "categories"
 FILE_SEPARATOR = "_"
 
 class CategoryMapper:
@@ -47,7 +47,7 @@ class CategoryMapper:
         self._persist_client_categories(client_id, client_categories)
 
     def _persist_client_categories(self, client_id, client_categories):
-        file_path = STORAGE_PATH + CATEGORY_PREFIX + client_id
+        file_path = STORAGE_PATH + CATEGORY_PREFIX + FILE_SEPARATOR + client_id
         with open(file_path, 'w') as client_category_file:
             json.dump(client_categories, client_category_file)
 
