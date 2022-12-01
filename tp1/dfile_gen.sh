@@ -159,8 +159,7 @@ then
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=tag_unique
       - LOGGING_LEVEL=INFO
-    volumes:
-      - ./storage/tag_unique:/workspace/storage"
+    "
   
   BASE+="${TAG_UNIQUE_INSTANCE}"
 fi
@@ -206,8 +205,7 @@ do
       - SERVICE_ID=joiner_${i}
       - INSTANCE_NR=${i}
       - LOGGING_LEVEL=INFO
-    volumes:
-      - ./storage/joiner:/workspace/storage"
+    "
 
   BASE+="${JOINER_INSTANCE}"
 done

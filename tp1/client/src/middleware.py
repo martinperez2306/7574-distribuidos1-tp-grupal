@@ -28,7 +28,7 @@ class ClientMiddleware(Middleware):
         super().send_to_exchange(INPUT_EXCHANGE, str(instance_nr), message)
 
     def send_end_message(self, message):
-        logging.info(f'Send end message {message}')
+        logging.info(f'Send end message')
         super().send_to_exchange(INPUT_EXCHANGE,'end', message)
 
     def send_handshake_message(self, message):
