@@ -132,9 +132,9 @@ class ThumbnailGrouper:
     def persist_data(self):
         for client_id in self.video_ids:
             client_data = {
-                "video_ids": self.video_ids[client_id],
-                "video_countries": self.video_countries[client_id],
-                "processed": self.processed[client_id]
+                "video_ids": list(self.video_ids[client_id]),
+                "video_countries": list(self.video_countries[client_id]),
+                "processed": list(self.processed[client_id])
             }
             file_path = STORAGE_PATH + THUMBNAIL_GROUPER_PREFIX + FILE_SEPARATOR + client_id
             with open(file_path, 'w') as thumbnail_grouper_file:

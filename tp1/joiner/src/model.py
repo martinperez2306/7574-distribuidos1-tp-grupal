@@ -16,7 +16,7 @@ class CategoryMapper:
 
     def _init_client_categories(self):
         for path in pathlib.Path(STORAGE_PATH).iterdir():
-            if path.is_file() and self._is_category_file():
+            if path.is_file() and self._is_category_file(path):
                 client_id = self._extract_client_from_category_file_path(
                     path)
                 with open(path) as client_categories_file:
