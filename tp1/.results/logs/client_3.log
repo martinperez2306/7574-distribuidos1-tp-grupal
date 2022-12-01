@@ -1,0 +1,41 @@
+INFO     Client starting work
+INFO     Register Client
+INFO     Client Accepted. Sending Data!
+INFO     Sending Category File: BR_category_id.json
+INFO     Sending Category File: CA_category_id.json
+INFO     Sending Category File: DE_category_id.json
+INFO     Sending Category File: FR_category_id.json
+INFO     Sending Category File: GB_category_id.json
+INFO     Sending Category File: IN_category_id.json
+INFO     Sending Category File: JP_category_id.json
+INFO     Sending Category File: KR_category_id.json
+INFO     Sending Category File: MX_category_id.json
+INFO     Sending Category File: RU_category_id.json
+INFO     Sending Category File: US_category_id.json
+INFO     Sending Raw Data File: BR_youtube_trending_data.csv
+INFO     Sending Raw Data File: CA_youtube_trending_data.csv
+INFO     Sending Raw Data File: DE_youtube_trending_data.csv
+INFO     Sending Raw Data File: FR_youtube_trending_data.csv
+INFO     Sending Raw Data File: GB_youtube_trending_data.csv
+INFO     Sending Raw Data File: IN_youtube_trending_data.csv
+INFO     Sending Raw Data File: JP_youtube_trending_data.csv
+INFO     Sending Raw Data File: KR_youtube_trending_data.csv
+INFO     Sending Raw Data File: MX_youtube_trending_data.csv
+INFO     Sending Raw Data File: RU_youtube_trending_data.csv
+INFO     Sending Raw Data File: US_youtube_trending_data.csv
+INFO     Send end message
+INFO     **** Results1 ****
+INFO      * ['3', 'title 0', 'Foreign']
+INFO      * ['55', 'title 0', 'Film & Animation']
+INFO      * ['0', 'title 0', 'Shorts']
+INFO      * ['4', 'title 0', 'Autos & Vehicles']
+INFO      * ['17', 'title 0', 'Shorts']
+INFO      * ['15', 'title 0', 'Film & Animation']
+INFO      * ['1', 'title 0', 'News & Politics']
+INFO      * ['60', 'title 0', 'Drama']
+INFO     **** Results3 ****
+INFO      * Top views happened: 2021-11-23
+INFO     **** Results2 ****
+INFO      * All files downloaded to path: .temp
+INFO     Recv All Responses!
+INFO     Bye bye!
