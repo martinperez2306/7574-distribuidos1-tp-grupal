@@ -1,4 +1,4 @@
-#bash
+#!/bin/bash
 
 for f in ./.tmp/logs/*; do
     results=${f/.tmp/.results}
