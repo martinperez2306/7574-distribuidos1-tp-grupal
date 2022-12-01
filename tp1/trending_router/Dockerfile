@@ -4,7 +4,8 @@ WORKDIR /workspace
 
 COPY ./trending_router/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
+RUN mkdir storage
 COPY ./trending_router .
 COPY ./common ./common
-RUN mkdir storage
+
 ENTRYPOINT ["/bin/sh"]

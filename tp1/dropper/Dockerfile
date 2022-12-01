@@ -4,9 +4,8 @@ WORKDIR /workspace
 
 COPY ./dropper/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
+RUN mkdir storage
 COPY ./dropper .
 COPY ./common ./common
-
-RUN mkdir storage
 
 ENTRYPOINT ["/bin/sh"]
