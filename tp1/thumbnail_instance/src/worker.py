@@ -9,9 +9,9 @@ from .model import ThumbnailGrouper
 class ThumbnailInstance(HeartbeathedWorker):
     def __init__(self, middleware) -> None:
         super().__init__(middleware)
-        
         self.grouper = ThumbnailGrouper()
-        
+        self.batch_size = 30        
+        self.message_count = 0
 
     def run(self):
         self.middleware.recv_category_count(self.recv_category_count)
@@ -24,20 +24,22 @@ class ThumbnailInstance(HeartbeathedWorker):
             client_id = message.client_id
 
             self.grouper.add_country_count(client_id, int(message.content))
-
-            logging.info(
-                f'Finish Recv Category Count: {message.content}')
+            self.grouper.persist_country_count()
+            logging.info(f'Finish Recv Category Count: {message.content}')
                 
     def recv_videos(self, message):
+
+        send_ack_flag = False
+        self.message_count+=1
 
         if MessageEnd.is_message(message):
             decoded_message = MessageEnd.decode(message)
             decoded_message.message_id = self.id
 
-            logging.info(
-                f'Finish Thumbnail Grouping Videos for Client: {decoded_message.client_id}')
+            logging.info(f'Finish Thumbnail Grouping Videos for Client: {decoded_message.client_id}')
             self.middleware.send_result_message(decoded_message.pack())
-            return
+            send_ack_flag = True
+            return send_ack_flag
             
         video = VideoMessage.decode(message)
         try:
@@ -52,12 +54,16 @@ class ThumbnailInstance(HeartbeathedWorker):
 
             if (completed):
                 self.middleware.send_result_message(message)
+                send_ack_flag = True
+                return send_ack_flag
 
-                
-                return
+            if (self.batch_size == self.message_count):
+                self.grouper.persist_data()
+                self.message_count = 0 
+                send_ack_flag = True
+                                     
+            return send_ack_flag
 
         except KeyError:
-            logging.error(
-                f'Key tags not found in {video.content}')
-
-    
+            logging.error(f'Key tags not found in {video.content}')
+            return False

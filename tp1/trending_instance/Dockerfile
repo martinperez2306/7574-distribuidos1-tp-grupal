@@ -7,4 +7,5 @@ RUN pip3 install -r requirements.txt
 RUN mkdir -p storage
 COPY ./trending_instance .
 COPY ./common ./common
+
 ENTRYPOINT ["/bin/sh"]
