@@ -1,20 +1,27 @@
 #!/bin/bash
 
+usage="Debe ingresar la frecuencia de caos (en segundos)"
+
+if [ $# -eq 0 ]; then
+  echo "$usage"
+  exit 1    
+fi
+
+KILL_FRECUENCY=$1
+
+random_select(){
+    ARRAY=("$@")
+    SIZE=${#ARRAY[@]}
+    INDEX=$(($RANDOM % $SIZE))
+    SELECTED=${ARRAY[$INDEX]}
+    echo $SELECTED
+}
+
 KILLEABLES=('^/thumbnail_router$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$')
-echo $KILLEABLES
-KILLEABLES_SIZE=${#KILLEABLES[@]}
-echo $KILLEABLES_SIZE
-KILLEABLES_INDEX=$(($RANDOM % $KILLEABLES_SIZE))
-echo $KILLEABLES_INDEX
-KILL_SELECTED=${KILLEABLES[$KILLEABLES_INDEX]}
+KILL_SELECTED=$(random_select "${KILLEABLES[@]}")
 echo $KILL_SELECTED
 
-CONTAINERS=($(docker ps -aq --filter name="$KILL_SELECTED"))
-echo $CONTAINERS
-CONTAINER_SIZE=${#CONTAINERS[@]}
-echo $CONTAINER_SIZE
-CONTAINER_INDEX=$(($RANDOM % $CONTAINER_SIZE))
-echo $CONTAINER_INDEX
-CONTAINER_SELECTED=${CONTAINERS[$CONTAINER_INDEX]}
+CONTAINERS=($(docker ps -aq --filter name="$KILL_SELECTED" --filter status=running))
+CONTAINER_SELECTED=$(random_select "${CONTAINERS[@]}")
 
 echo "Killing container $CONTAINER_SELECTED"
