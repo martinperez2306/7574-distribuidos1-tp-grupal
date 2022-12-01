@@ -4,7 +4,7 @@ WORKDIR /workspace
 
 COPY ./joiner/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
-RUN mkdir storage
+RUN mkdir -p storage
 COPY ./joiner .
 COPY ./common ./common
 

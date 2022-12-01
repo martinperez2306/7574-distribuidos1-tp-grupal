@@ -6,5 +6,5 @@ COPY ./thumbnail_instance/requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 COPY ./thumbnail_instance .
 COPY ./common ./common
-RUN mkdir storage
+RUN mkdir -p storage
 ENTRYPOINT ["/bin/sh"]

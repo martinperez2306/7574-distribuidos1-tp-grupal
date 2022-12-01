@@ -7,6 +7,6 @@ RUN pip3 install -r requirements.txt
 COPY ./dropper .
 COPY ./common ./common
 
-RUN mkdir storage
+RUN mkdir -p storage
 
 ENTRYPOINT ["/bin/sh"]

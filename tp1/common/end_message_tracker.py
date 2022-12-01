@@ -1,5 +1,6 @@
 import json
 import logging
+import os 
 
 STORE_PATH = './storage/end_message.json'
 
@@ -8,7 +9,6 @@ class EndMessageTracker():
     def __init__(self, nr_instances) -> None:
         self.nr_instances = nr_instances
         self.clients = {}
-        self.storage_file = open(STORE_PATH, 'w+')
         self._loads()
 
     def add_end_message(self, client_id, end_message_id):
@@ -24,15 +24,16 @@ class EndMessageTracker():
         for client in r:
             r[client] = list(r[client])
 
-        json_data = json.dumps(r)
-        self.storage_file.seek(0)
-        json.dump(json_data, self.storage_file)
-        self.storage_file.flush()
+        with open(STORE_PATH, 'w') as f:
+            json.dump(r, f)
+        
 
     def _loads(self):
         try:
-            data = json.load(self.storage_file)
-            for key in data:
-                self.clients[key] = set(data[key])
+            if os.path.exists(STORE_PATH):
+                with open(STORE_PATH) as f:
+                    data = json.load(f)
+                    for key in data:
+                        self.clients[key] = set(data[key])
         except ValueError:
             logging.info('No previous End Message Tracking File')
