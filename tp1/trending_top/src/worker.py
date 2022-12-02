@@ -26,10 +26,10 @@ class TrendingTop(HeartbeathedWorker):
         self.model.add_element(client_id, instance_id, date, views)
 
         if (self.model.results_len(client_id) == self.trending_instances):
-            message = Result3(message.client_id, "FINAL_RESULT", self.model.get_date(client_id))
+            message = Result3(message.client_id, self.model.get_date(client_id), self.model.get_date(client_id))
             
             self.middleware.send_result_message(message.pack())
 
-            end_message = EndResult3(message.client_id, "FINAL_RESULT")
+            end_message = EndResult3(message.client_id)
             self.middleware.send_result_message(end_message.pack())
             

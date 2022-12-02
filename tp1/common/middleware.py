@@ -2,7 +2,10 @@ import logging
 import os
 import pika
 
+from .message import BaseMessage
+from .lru_cache import LRUCache
 logging.getLogger("pika").propagate = False
+MESSAGE_BUFFER = 200
 
 
 class Middleware():
@@ -13,6 +16,7 @@ class Middleware():
             pika.ConnectionParameters(host))
 
         self.channel = self.connection.channel()
+        self.message_cache = LRUCache(MESSAGE_BUFFER)
 
     def send_message(self, queue, message):
         self.channel.basic_publish(exchange='',
@@ -42,6 +46,10 @@ class Middleware():
         self.channel.start_consuming()
 
     def callback_with_ack(self, callback, ch, method, properties, body):
+        base_msg, _ = BaseMessage.decode(body)
+        unique_id = f"{base_msg.client_id}#{base_msg.message_id}"
+        # if()
+
         callback(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
