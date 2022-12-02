@@ -17,11 +17,20 @@ random_select(){
     echo $SELECTED
 }
 
-KILLEABLES=('^/thumbnail_router$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$')
-KILL_SELECTED=$(random_select "${KILLEABLES[@]}")
-echo $KILL_SELECTED
+while true
+do
 
-CONTAINERS=($(docker ps -aq --filter name="$KILL_SELECTED" --filter status=running))
-CONTAINER_SELECTED=$(random_select "${CONTAINERS[@]}")
+  #ALL KILLEABLES ('^/thumbnail_router$' '^/trending_router$' '^/trending_top$' '^/tag_unique$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$' '^/dropper_[[:digit:]]+$' '^/like_filter_[[:digit:]]+$')
+  KILLEABLES=('^/thumbnail_router$' '^/trending_router$' '^/trending_top$' '^/tag_unique$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$' '^/dropper_[[:digit:]]+$' '^/like_filter_[[:digit:]]+$')
+  KILL_SELECTED=$(random_select "${KILLEABLES[@]}")
+  echo $KILL_SELECTED
 
-echo "Killing container $CONTAINER_SELECTED"
+  CONTAINERS=($(docker ps -aq --filter name="$KILL_SELECTED" --filter status=running))
+  CONTAINER_SELECTED=$(random_select "${CONTAINERS[@]}")
+
+  echo "Killing container $CONTAINER_SELECTED"
+  docker kill $CONTAINER_SELECTED
+
+  sleep $KILL_FRECUENCY
+
+done
