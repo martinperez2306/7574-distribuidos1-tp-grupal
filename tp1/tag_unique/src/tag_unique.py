@@ -17,7 +17,7 @@ class TagUnique(HeartbeathedWorker):
         if MessageEnd.is_message(message):
             logging.info(f'Finish Recv Videos')
             parsed_message = MessageEnd.decode(message)
-            end_message = EndResult1(parsed_message.client_id, '1')
+            end_message = EndResult1(parsed_message.client_id)
             self.middleware.send_result_message(end_message.pack())
             return
 

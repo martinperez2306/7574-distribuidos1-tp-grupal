@@ -52,7 +52,7 @@ class BaseMessage:
 
 class MessageHandshake(BaseMessage):
     def __init__(self, client_id) -> None:
-        super().__init__(MESSAGE_HANDSHAKE, client_id)
+        super().__init__(MESSAGE_HANDSHAKE, client_id, 'HSH')
 
     @staticmethod
     def is_message(buffer) -> bool:
@@ -134,7 +134,7 @@ class BaseResult(BaseMessage):
 
 class CategoryMessage(BaseResult):
     def __init__(self, client_id, content) -> None:
-        super().__init__(MESSAGE_CATEGORY_COUNT, client_id, '', content)
+        super().__init__(MESSAGE_CATEGORY_COUNT, client_id, 'CAT_MSG', content)
 
     @staticmethod
     def is_message(buffer) -> bool:
@@ -214,8 +214,8 @@ class Result3(BaseResult):
 
 
 class EndResult1(BaseMessage):
-    def __init__(self, client_id, message_id) -> None:
-        super().__init__(END_RESULT_1, client_id, message_id)
+    def __init__(self, client_id) -> None:
+        super().__init__(END_RESULT_1, client_id, 'ER1')
 
     @staticmethod
     def is_message(buffer) -> bool:
@@ -223,8 +223,8 @@ class EndResult1(BaseMessage):
 
 
 class EndResult2(BaseMessage):
-    def __init__(self, client_id, message_id) -> None:
-        super().__init__(END_RESULT_2, client_id, message_id)
+    def __init__(self, client_id) -> None:
+        super().__init__(END_RESULT_2, client_id, 'ER2')
 
     @staticmethod
     def is_message(buffer) -> bool:
@@ -232,8 +232,8 @@ class EndResult2(BaseMessage):
 
 
 class EndResult3(BaseMessage):
-    def __init__(self, client_id, message_id) -> None:
-        super().__init__(END_RESULT_3, client_id, message_id)
+    def __init__(self, client_id) -> None:
+        super().__init__(END_RESULT_3, client_id, 'ER3')
 
     @staticmethod
     def is_message(buffer) -> bool:
