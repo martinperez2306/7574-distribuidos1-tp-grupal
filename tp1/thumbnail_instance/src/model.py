@@ -43,7 +43,7 @@ class ThumbnailGrouper:
                         data = json.load(thumbnail_grouper_file)
                         self.video_ids[client_id] = data.video_ids
                         self.video_countries[client_id] = data.video_countries
-                        self.processed[client_id] = data.processed
+                        self.processed[client_id] = set(data.processed)
 
     
     def _is_country_count_file(self, path):
@@ -81,13 +81,16 @@ class ThumbnailGrouper:
         trending_dates = video_ids[video_id]
         trending_countries = video_countries[video_id]
 
+        if (video_id in processed):
+            return False
+
         if (not country in trending_countries):
             trending_countries.append(country)
 
         if (not trending_date in trending_dates):
             trending_dates.append(trending_date)
 
-        if (len(trending_countries) >= country_count and len(trending_dates) >= MIN_PERIOD_IN_DAYS and video_id not in processed):
+        if (len(trending_countries) >= country_count and len(trending_dates) >= MIN_PERIOD_IN_DAYS):
             processed.add(video_id)
             return True
 
@@ -132,8 +135,8 @@ class ThumbnailGrouper:
     def persist_data(self):
         for client_id in self.video_ids:
             client_data = {
-                "video_ids": list(self.video_ids[client_id]),
-                "video_countries": list(self.video_countries[client_id]),
+                "video_ids": self.video_ids[client_id],
+                "video_countries": self.video_countries[client_id],
                 "processed": list(self.processed[client_id])
             }
             file_path = STORAGE_PATH + THUMBNAIL_GROUPER_PREFIX + FILE_SEPARATOR + client_id
