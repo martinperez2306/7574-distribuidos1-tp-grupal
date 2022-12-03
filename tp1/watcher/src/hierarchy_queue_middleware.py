@@ -50,7 +50,7 @@ class HierarchyQueueMiddlware(Middleware):
         for slave_id in range(self.hyerarchy_instances):
             queue = self.neighborhood + "_" + str(slave_id)
             self.channel.queue_declare(queue)
-        self.channel.basic_qos(prefetch_count=1)
+        
 
     def _get_neighbour(self) -> int:
         if self.hyerarchy_id == (self.hyerarchy_instances - 1):

@@ -33,7 +33,7 @@ class DropperMiddlware(Middleware):
 
         self.channel.queue_declare(
             queue=VIDEO_DATA_QUEUE, durable=True)
-        self.channel.basic_qos(prefetch_count=30)
+        
 
     def recv_video_message(self, callback):
 

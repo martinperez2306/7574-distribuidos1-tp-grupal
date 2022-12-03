@@ -45,7 +45,7 @@ class JoinerMiddlware(Middleware):
         self.channel.queue_bind(
             exchange=JOINER_EXCHANGE, queue=self.joiner_input, routing_key='end')
             
-        self.channel.basic_qos(prefetch_count=30)
+        
 
     def recv_category_message(self, callback):
         self.cat_msg_tag = super().recv_message(self.categories_queue, callback)

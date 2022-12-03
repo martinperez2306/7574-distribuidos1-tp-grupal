@@ -17,7 +17,8 @@ class Middleware():
 
         self.channel = self.connection.channel()
         self.message_cache = LRUCache(MESSAGE_BUFFER)
-
+        self.channel.basic_qos(prefetch_count=60)
+        
     def send_message(self, queue, message):
         self.channel.basic_publish(exchange='',
                                    routing_key=queue,
@@ -55,6 +56,7 @@ class Middleware():
 
     def callback_with_multiple_ack(self, callback, ch, method, properties, body):
         send_ack_flag = callback(body)
+        
         if send_ack_flag:
             ch.basic_ack(delivery_tag=method.delivery_tag, multiple=True)
         

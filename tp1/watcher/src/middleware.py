@@ -14,7 +14,7 @@ class WatcherMiddlware(Middleware):
         self.channel.queue_declare(self.queue)
         self.channel.queue_bind(exchange=WATCHER_EXCHANGE, queue=self.queue)
 
-        self.channel.basic_qos(prefetch_count=1)
+        
 
     def run(self):
         self.running = True

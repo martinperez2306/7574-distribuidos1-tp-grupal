@@ -28,9 +28,9 @@ class ThumbnailInstance(HeartbeathedWorker):
             logging.info(f'Finish Recv Category Count: {message.content}')
                 
     def recv_videos(self, message):
-
         send_ack_flag = False
         self.message_count+=1
+
 
         if MessageEnd.is_message(message):
             decoded_message = MessageEnd.decode(message)
@@ -50,14 +50,14 @@ class ThumbnailInstance(HeartbeathedWorker):
             trending_date = datetime.strptime(
                 video.content['trending_date'], '%Y-%m-%dT%H:%M:%SZ').strftime("%Y-%m-%d")
 
-            completed = self.grouper.add_date(video.client_id, video_id, country, trending_date)
+            completed = self.grouper.add_entry(video.client_id, video_id, country, trending_date)
 
             if (completed):
                 self.middleware.send_result_message(message)
                 send_ack_flag = True
                 return send_ack_flag
 
-            if (self.batch_size == self.message_count):
+            if (self.batch_size <= self.message_count):
                 self.grouper.persist_data()
                 self.message_count = 0 
                 send_ack_flag = True

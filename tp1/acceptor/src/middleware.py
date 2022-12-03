@@ -12,7 +12,7 @@ class AcceptorMiddlware(Middleware):
 
         self.channel.queue_declare(
             queue=RESULTS_QUEUE, durable=True)
-        self.channel.basic_qos(prefetch_count=30)
+        
 
     def recv_results_messages(self, callback):
         self.results_tag = super().recv_message(RESULTS_QUEUE, callback)

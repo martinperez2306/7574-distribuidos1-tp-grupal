@@ -21,7 +21,7 @@ class LikesFilterMiddlware(Middleware):
         self.channel.queue_bind(
             exchange=DISTRIBUTION_EXCHANGE, queue=LIKES_QUEUE)
 
-        self.channel.basic_qos(prefetch_count=30)
+        
 
     def recv_video_message(self, callback):
 
