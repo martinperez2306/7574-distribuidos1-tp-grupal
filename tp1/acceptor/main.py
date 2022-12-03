@@ -9,13 +9,14 @@ def main():
 
     initialize_log(os.getenv("LOGGING_LEVEL") or 'INFO')
 
+    max_clients = os.getenv('MAX_CLIENTS') or 3
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
     logging.info("Acceptor starting work")
 
     # Initialize server and start server loop
     middleware = AcceptorMiddlware()
-    worker = Acceptor(middleware)
+    worker = Acceptor(middleware, max_clients)
 
     worker.start()
 
