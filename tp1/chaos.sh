@@ -8,7 +8,7 @@ if [ $# -eq 0 ]; then
 fi
 
 KILL_FRECUENCY=$1
-KILLEABLES=( "$@" )
+KILLEABLES=("${@:2}")
 
 random_select(){
     ARRAY=("$@")
