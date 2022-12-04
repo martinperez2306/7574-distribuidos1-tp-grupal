@@ -8,4 +8,5 @@ COPY ./client .
 COPY ./common ./common
 
 
+ENV PYTHONHASHSEED 7
 ENTRYPOINT ["/bin/sh"]

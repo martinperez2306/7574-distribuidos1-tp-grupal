@@ -8,4 +8,5 @@ RUN mkdir -p storage
 COPY ./trending_instance .
 COPY ./common ./common
 
+ENV PYTHONHASHSEED 7
 ENTRYPOINT ["/bin/sh"]

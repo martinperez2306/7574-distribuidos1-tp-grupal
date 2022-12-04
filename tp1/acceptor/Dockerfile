@@ -8,4 +8,5 @@ RUN mkdir -p storage
 COPY ./acceptor .
 COPY ./common ./common
 
+ENV PYTHONHASHSEED 7
 ENTRYPOINT ["/bin/sh"]

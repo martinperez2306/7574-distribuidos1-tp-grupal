@@ -10,4 +10,5 @@ COPY ./common ./common
 
 RUN mkdir -p storage
 
+ENV PYTHONHASHSEED 7
 ENTRYPOINT ["/bin/sh"]
