@@ -25,10 +25,13 @@ do
   echo $KILL_SELECTED
 
   CONTAINERS=($(docker ps -aq --filter name="$KILL_SELECTED" --filter status=running))
-  CONTAINER_SELECTED=$(random_select "${CONTAINERS[@]}")
-
-  echo "Killing container $CONTAINER_SELECTED"
-  docker kill $CONTAINER_SELECTED
+  if [ ${#CONTAINERS[@]} -eq 0 ]; then
+    echo "Waiting for at least one $KILL_SELECTED"
+  else
+    CONTAINER_SELECTED=$(random_select "${CONTAINERS[@]}")
+    echo "Killing container $CONTAINER_SELECTED"
+    docker kill $CONTAINER_SELECTED
+  fi
 
   sleep $KILL_FRECUENCY
 
