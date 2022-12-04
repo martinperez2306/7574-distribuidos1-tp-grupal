@@ -5,7 +5,7 @@ import pika
 from .message import BaseMessage
 from .lru_cache import LRUCache
 logging.getLogger("pika").propagate = False
-MESSAGE_BUFFER = 200
+MESSAGE_BUFFER = 500
 
 
 class Middleware():
@@ -49,14 +49,28 @@ class Middleware():
     def callback_with_ack(self, callback, ch, method, properties, body):
         base_msg, _ = BaseMessage.decode(body)
         unique_id = f"{base_msg.client_id}#{base_msg.message_id}"
-        # if()
+        
+        if(not self.message_cache.is_present(unique_id)):
+            self.message_cache.put(unique_id)
+            callback(body)
+        else:
+            logging.info(f"Duplicated Message {unique_id}")
 
-        callback(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def callback_with_multiple_ack(self, callback, ch, method, properties, body):
-        send_ack_flag = callback(body)
+        base_msg, _ = BaseMessage.decode(body)
+        unique_id = f"{base_msg.code}#{base_msg.client_id}#{base_msg.message_id}"
         
-        if send_ack_flag:
-            ch.basic_ack(delivery_tag=method.delivery_tag, multiple=True)
+        is_present = self.message_cache.is_present(unique_id)
         
+        if(not is_present):
+            self.message_cache.put(unique_id)
+            send_ack_flag = callback(body)
+        
+            if send_ack_flag:
+                ch.basic_ack(delivery_tag=method.delivery_tag, multiple=True)
+        
+        else:
+            logging.info(f"Duplicated Message {unique_id}")
+            ch.basic_ack(delivery_tag=method.delivery_tag)

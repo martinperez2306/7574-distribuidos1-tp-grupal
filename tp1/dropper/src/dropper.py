@@ -49,6 +49,7 @@ class Dropper(HeartbeathedWorker):
 
             message = VideoMessage(file_message.client_id, message_id, dropped)
             self.middleware.send_video_message(message.pack(), message.message_id)
+            index += 1
 
         f.close()
         # self.middleware.send_video_message(message.pack())
