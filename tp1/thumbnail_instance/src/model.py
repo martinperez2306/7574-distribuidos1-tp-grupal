@@ -52,24 +52,26 @@ class ThumbnailGrouper:
                 self.processed.setdefault(client_id, set())
 
                 with open(path) as file:
-
                     for line in file:
-                        data = line.rstrip().split(',')
-                        code = data[0]
-                        video_id = data[1]
+                        try:
+                            data = line.rstrip().split(',')
+                            code = data[0]
+                            video_id = data[1]
 
-                        if (code == PROCESSED_CODE):
-                            processed = self.processed[client_id]
-                            processed.add(video_id)
+                            if (code == PROCESSED_CODE):
+                                processed = self.processed[client_id]
+                                processed.add(video_id)
 
-                        if (code == DATE_CODE):
-                            value = data[2]
-                            self._add_date(client_id, video_id, value, False)
+                            if (code == DATE_CODE):
+                                value = data[2]
+                                self._add_date(client_id, video_id, value, False)
 
-                        if (code == COUNTRY_CODE):
-                            value = data[2]
-                            self._add_country(
-                                client_id, video_id, value, False)
+                            if (code == COUNTRY_CODE):
+                                value = data[2]
+                                self._add_country(
+                                    client_id, video_id, value, False)
+                        except ValueError:
+                            logging.error(f'Huge error restoing line: {line}')        
 
                 logging.info(f'Successfully restored data for {client_id}')
 
