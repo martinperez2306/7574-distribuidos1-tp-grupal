@@ -1,29 +1,37 @@
 version: "3"
 services:
   # Update this to the name of the service you want to work with in your docker-compose.yml file
-  client:
+  # client_0:
+  #   volumes:
+  #     - ./client:/workspace
+  #     - ./data/client0:/workspace/data
+  #     - ./.temp0:/workspace/.temp
+  #     - ./common:/workspace/common
+
+  #   entrypoint: /bin/sh -c "while sleep 1000; do :; done"
+
+  acceptor:
     volumes:
-      - ./client:/workspace
+      - ./acceptor:/workspace
       - ./common:/workspace/common
-      - ./data:/workspace/data
 
     entrypoint: /bin/sh -c "while sleep 1000; do :; done"
 
-  joiner:
-    volumes:
-      - ./joiner:/workspace
-      - ./common:/workspace/common
+  # joiner_0:
+  #   volumes:
+  #     - ./joiner:/workspace
+  #     - ./common:/workspace/common
 
-    entrypoint: /bin/sh -c "while sleep 1000; do :; done"
+  #   entrypoint: /bin/sh -c "while sleep 1000; do :; done"
 
-  # dropper:
+  # dropper_0:
   #   volumes:
   #     - ./dropper:/workspace
   #     - ./common:/workspace/common
 
   #   entrypoint: /bin/sh -c "while sleep 1000; do :; done"
 
-  # likes_filter:
+  # like_filter_0:
   #   volumes:
   #     - ./likes_filter:/workspace
   #     - ./common:/workspace/common
@@ -43,9 +51,16 @@ services:
 
   #   entrypoint: /bin/sh -c "while sleep 1000; do :; done"
 
-  # thumbnail_instance:
+  # thumbnail_0:
   #   volumes:
   #     - ./thumbnail_instance:/workspace
+  #     - ./common:/workspace/common
+
+  #   entrypoint: /bin/sh -c "while sleep 1000; do :; done"
+
+  # trending_0:
+  #   volumes:
+  #     - ./trending_instance:/workspace
   #     - ./common:/workspace/common
 
   #   entrypoint: /bin/sh -c "while sleep 1000; do :; done"

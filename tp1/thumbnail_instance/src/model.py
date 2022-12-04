@@ -71,7 +71,7 @@ class ThumbnailGrouper:
                                 self._add_country(
                                     client_id, video_id, value, False)
                         except ValueError:
-                            logging.error(f'Huge error restoing line: {line}')        
+                            logging.error(f'Huge error restoring line: {line}')        
 
                 logging.info(f'Successfully restored data for {client_id}')
 
