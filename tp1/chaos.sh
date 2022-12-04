@@ -1,6 +1,6 @@
 #!/bin/bash
 
-usage="Debe ingresar la frecuencia de caos (en segundos)"
+usage="Debe ingresar la frecuencia de caos (en segundos) y el listado de servicios a tirar"
 
 if [ $# -eq 0 ]; then
   echo "$usage"
@@ -8,6 +8,7 @@ if [ $# -eq 0 ]; then
 fi
 
 KILL_FRECUENCY=$1
+KILLEABLES=( "$@" )
 
 random_select(){
     ARRAY=("$@")
@@ -20,8 +21,6 @@ random_select(){
 while true
 do
 
-  #ALL KILLEABLES ('^/thumbnail_router$' '^/trending_router$' '^/trending_top$' '^/tag_unique$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$' '^/dropper_[[:digit:]]+$' '^/like_filter_[[:digit:]]+$')
-  KILLEABLES=('^/thumbnail_router$' '^/trending_router$' '^/trending_top$' '^/tag_unique$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$' '^/dropper_[[:digit:]]+$' '^/like_filter_[[:digit:]]+$')
   KILL_SELECTED=$(random_select "${KILLEABLES[@]}")
   echo $KILL_SELECTED
 
