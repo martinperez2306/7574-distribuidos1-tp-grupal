@@ -73,6 +73,23 @@ Que realizará un diff entre las carpetas `.tmp/client_X` con su respectivo `.re
 
 En caso exitoso, no habrá diferencia entre ambos directorios.
 
+### Chaos
+
+Se proveen una serie de `chaos scripts` para simular la caída de los servicios. Estos scripts se ejecutan de la siguiente manera:
+
+```
+chaos_{SERVICE}.sh <KILL_FRECUENCY>
+```
+
+Donde se le indica la frecuencia con la cual bajar el servicio.
+
+También se provee un script para bajar aleatoriamente cualquier servicio, el mismo también recibe la frecuencia de caída:
+
+```
+chaos_all.sh <KILL_FRECUENCY>
+```
+
+En los logs se podrá observar tanto la caída del servicio, como la recuperación mediante los `Watchers` disponibles en el sistema.
 
 ### Resumen
 
