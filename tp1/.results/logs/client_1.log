@@ -25,26 +25,32 @@ INFO     Sending Raw Data File: RU_youtube_trending_data.csv
 INFO     Sending Raw Data File: US_youtube_trending_data.csv
 INFO     Send end message
 INFO     **** Results1 ****
-INFO      * ['1411', 'title 3000', 'News & Politics']
-INFO      * ['1827', 'title 1000', 'Music']
-INFO      * ['684', 'title 1000', 'Foreign']
-INFO      * ['1023', 'title 0', 'Music']
-INFO      * ['18', 'title 4000', 'Music']
-INFO      * ['1788', 'title 3000', 'Movies']
-INFO      * ['3427', 'title 2000', 'Action/Adventure']
-INFO      * ['3187', 'title 3000', 'People & Blogs']
-INFO      * ['2196', 'title 1000', 'Movies']
-INFO      * ['3689', 'title 0', 'Drama']
-INFO      * ['759', 'title 1000', 'Drama']
-INFO      * ['2126', 'title 4000', 'Anime/Animation']
-INFO      * ['3816', 'title 0', 'Science & Technology']
-INFO      * ['1546', 'title 0', 'Howto & Style']
-INFO      * ['3908', 'title 3000', 'Gaming']
-INFO      * ['2861', 'title 4000', 'Classics']
-INFO      * ['2846', 'title 3000', 'Music']
-INFO      * ['1272', 'title 1000', 'Howto & Style']
+INFO      * ['2992', 'title 1000', 'Foreign']
+INFO      * ['3278', 'title 2000', 'Pets & Animals']
+INFO      * ['108', 'title 4000', 'Film & Animation']
+INFO      * ['3437', 'title 0', 'Family']
+INFO      * ['1719', 'title 3000', 'Travel & Events']
+INFO      * ['2995', 'title 2000', 'Music']
+INFO      * ['278', 'title 0', 'Action/Adventure']
+INFO      * ['3022', 'title 1000', 'Anime/Animation']
+INFO      * ['2685', 'title 0', 'Entertainment']
+INFO      * ['1120', 'title 1000', 'Foreign']
+INFO      * ['2068', 'title 3000', 'Education']
+INFO      * ['1756', 'title 0', 'Autos & Vehicles']
+INFO      * ['2281', 'title 4000', 'Movies']
+INFO      * ['3257', 'title 0', 'Thriller']
+INFO      * ['3636', 'title 2000', 'News & Politics']
+INFO      * ['485', 'title 3000', 'News & Politics']
+INFO      * ['1984', 'title 4000', 'Short Movies']
+INFO      * ['3956', 'title 1000', 'People & Blogs']
+INFO      * ['1096', 'title 4000', 'Sci-Fi/Fantasy']
+INFO      * ['3739', 'title 4000', 'Pets & Animals']
+INFO      * ['2505', 'title 3000', 'Classics']
+INFO      * ['1391', 'title 0', 'Family']
+INFO      * ['3195', 'title 2000', 'Drama']
+INFO      * ['297', 'title 4000', 'Education']
 INFO     **** Results3 ****
-INFO      * Top views happened: 2022-03-15
+INFO      * Top views happened: 2021-07-23
 INFO     **** Results2 ****
 INFO      * All files downloaded to path: .temp
 INFO     Recv All Responses!
