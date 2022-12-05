@@ -25,16 +25,34 @@ INFO     Sending Raw Data File: RU_youtube_trending_data.csv
 INFO     Sending Raw Data File: US_youtube_trending_data.csv
 INFO     Send end message
 INFO     **** Results1 ****
-INFO      * ['3', 'title 0', 'Foreign']
-INFO      * ['55', 'title 0', 'Film & Animation']
-INFO      * ['0', 'title 0', 'Shorts']
-INFO      * ['4', 'title 0', 'Autos & Vehicles']
-INFO      * ['17', 'title 0', 'Shorts']
-INFO      * ['15', 'title 0', 'Film & Animation']
-INFO      * ['1', 'title 0', 'News & Politics']
-INFO      * ['60', 'title 0', 'Drama']
+INFO      * ['1715', 'title 0', 'Pets & Animals']
+INFO      * ['3087', 'title 1000', 'Entertainment']
+INFO      * ['2648', 'title 3000', 'Family']
+INFO      * ['702', 'title 4000', 'Film & Animation']
+INFO      * ['3080', 'title 4000', 'Gaming']
+INFO      * ['3045', 'title 1000', 'Travel & Events']
+INFO      * ['2745', 'title 0', 'News & Politics']
+INFO      * ['1892', 'title 0', 'Autos & Vehicles']
+INFO      * ['2441', 'title 4000', 'People & Blogs']
+INFO      * ['2382', 'title 4000', 'Horror']
+INFO      * ['2116', 'title 3000', 'Shows']
+INFO      * ['2379', 'title 2000', 'People & Blogs']
+INFO      * ['422', 'title 2000', 'Documentary']
+INFO      * ['127', 'title 3000', 'Drama']
+INFO      * ['1347', 'title 0', 'Classics']
+INFO      * ['3435', 'title 4000', 'Foreign']
+INFO      * ['54', 'title 1000', 'Gaming']
+INFO      * ['3059', 'title 2000', 'Sci-Fi/Fantasy']
+INFO      * ['2921', 'title 0', 'Travel & Events']
+INFO      * ['2115', 'title 2000', 'Sports']
+INFO      * ['1252', 'title 4000', 'Documentary']
+INFO      * ['3434', 'title 3000', 'Music']
+INFO      * ['2446', 'title 1000', 'Family']
+INFO      * ['441', 'title 4000', 'Documentary']
+INFO      * ['3483', 'title 3000', 'People & Blogs']
+INFO      * ['1545', 'title 3000', 'Family']
 INFO     **** Results3 ****
-INFO      * Top views happened: 2021-11-23
+INFO      * Top views happened: 2022-04-26
 INFO     **** Results2 ****
 INFO      * All files downloaded to path: .temp
 INFO     Recv All Responses!

@@ -22,7 +22,6 @@ class TrendingTop(HeartbeathedWorker):
         date = values[0]
         views = int(values[1])
 
-        logging.info(f'{date}, {views}')
         self.model.add_element(client_id, instance_id, date, views)
 
         if (self.model.results_len(client_id) == self.trending_instances):

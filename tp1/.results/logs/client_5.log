@@ -25,15 +25,28 @@ INFO     Sending Raw Data File: RU_youtube_trending_data.csv
 INFO     Sending Raw Data File: US_youtube_trending_data.csv
 INFO     Send end message
 INFO     **** Results1 ****
-INFO      * ['21', 'title 0', 'Comedy']
-INFO      * ['4', 'title 0', 'People & Blogs']
-INFO      * ['33', 'title 0', 'Entertainment']
-INFO      * ['26', 'title 0', 'Family']
-INFO      * ['37', 'title 0', 'Education']
-INFO      * ['4', 'title 0', 'Drama']
-INFO      * ['0', 'title 0', 'Entertainment']
+INFO      * ['3525', 'title 1000', 'Howto & Style']
+INFO      * ['2700', 'title 0', 'Shows']
+INFO      * ['233', 'title 3000', 'Sports']
+INFO      * ['2765', 'title 1000', 'Classics']
+INFO      * ['3270', 'title 2000', 'Classics']
+INFO      * ['223', 'title 2000', 'Documentary']
+INFO      * ['2860', 'title 4000', 'Trailers']
+INFO      * ['3519', 'title 4000', 'Trailers']
+INFO      * ['1661', 'title 3000', 'Gaming']
+INFO      * ['1427', 'title 4000', 'Short Movies']
+INFO      * ['1236', 'title 2000', 'Sci-Fi/Fantasy']
+INFO      * ['1252', 'title 4000', 'Classics']
+INFO      * ['1164', 'title 0', 'Drama']
+INFO      * ['1523', 'title 3000', 'Anime/Animation']
+INFO      * ['1879', 'title 0', 'Movies']
+INFO      * ['3912', 'title 0', 'Foreign']
+INFO      * ['3032', 'title 0', 'Short Movies']
+INFO      * ['3847', 'title 4000', 'Classics']
+INFO      * ['1998', 'title 3000', 'Entertainment']
+INFO      * ['315', 'title 1000', 'Science & Technology']
 INFO     **** Results3 ****
-INFO      * Top views happened: 2022-01-30
+INFO      * Top views happened: 2019-07-26
 INFO     **** Results2 ****
 INFO      * All files downloaded to path: .temp
 INFO     Recv All Responses!

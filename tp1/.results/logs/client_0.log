@@ -25,16 +25,32 @@ INFO     Sending Raw Data File: RU_youtube_trending_data.csv
 INFO     Sending Raw Data File: US_youtube_trending_data.csv
 INFO     Send end message
 INFO     **** Results1 ****
-INFO      * ['43', 'title 0', 'Short Movies']
-INFO      * ['8', 'title 0', 'Howto & Style']
-INFO      * ['49', 'title 0', 'Trailers']
-INFO      * ['24', 'title 0', 'Science & Technology']
-INFO      * ['0', 'title 0', 'Family']
-INFO      * ['24', 'title 0', 'Action/Adventure']
-INFO      * ['39', 'title 0', 'People & Blogs']
-INFO      * ['14', 'title 0', 'Family']
+INFO      * ['902', 'title 1000', 'Autos & Vehicles']
+INFO      * ['3356', 'title 4000', 'Pets & Animals']
+INFO      * ['946', 'title 0', 'Shorts']
+INFO      * ['3230', 'title 1000', 'Gaming']
+INFO      * ['1087', 'title 2000', 'Short Movies']
+INFO      * ['1139', 'title 3000', 'Anime/Animation']
+INFO      * ['3377', 'title 4000', 'Entertainment']
+INFO      * ['2752', 'title 3000', 'Family']
+INFO      * ['3818', 'title 4000', 'Sci-Fi/Fantasy']
+INFO      * ['3137', 'title 0', 'Drama']
+INFO      * ['3545', 'title 1000', 'Horror']
+INFO      * ['1430', 'title 4000', 'People & Blogs']
+INFO      * ['302', 'title 3000', 'Pets & Animals']
+INFO      * ['3513', 'title 2000', 'Gaming']
+INFO      * ['1353', 'title 1000', 'Howto & Style']
+INFO      * ['2867', 'title 1000', 'Entertainment']
+INFO      * ['972', 'title 2000', 'Shorts']
+INFO      * ['3221', 'title 4000', 'People & Blogs']
+INFO      * ['732', 'title 3000', 'Entertainment']
+INFO      * ['2850', 'title 0', 'Action/Adventure']
+INFO      * ['3513', 'title 3000', 'Shows']
+INFO      * ['469', 'title 0', 'Foreign']
+INFO      * ['2502', 'title 4000', 'Howto & Style']
+INFO      * ['3523', 'title 2000', 'Anime/Animation']
 INFO     **** Results3 ****
-INFO      * Top views happened: 2022-05-21
+INFO      * Top views happened: 2020-03-15
 INFO     **** Results2 ****
 INFO      * All files downloaded to path: .temp
 INFO     Recv All Responses!
