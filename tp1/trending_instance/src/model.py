@@ -82,7 +82,7 @@ class Grouper():
 
         with open(path) as client_categories_file:
             for line in client_categories_file:
-                print(line)
+                
                 message_id, date, views = line.rstrip().split(',')
 
                 self._add_raw(client_id, message_id, date, int(views))

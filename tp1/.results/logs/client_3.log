@@ -24,17 +24,35 @@ INFO     Sending Raw Data File: MX_youtube_trending_data.csv
 INFO     Sending Raw Data File: RU_youtube_trending_data.csv
 INFO     Sending Raw Data File: US_youtube_trending_data.csv
 INFO     Send end message
-INFO     **** Results1 ****
-INFO      * ['3', 'title 0', 'Foreign']
-INFO      * ['55', 'title 0', 'Film & Animation']
-INFO      * ['0', 'title 0', 'Shorts']
-INFO      * ['4', 'title 0', 'Autos & Vehicles']
-INFO      * ['17', 'title 0', 'Shorts']
-INFO      * ['15', 'title 0', 'Film & Animation']
-INFO      * ['1', 'title 0', 'News & Politics']
-INFO      * ['60', 'title 0', 'Drama']
 INFO     **** Results3 ****
-INFO      * Top views happened: 2021-11-23
+INFO      * Top views happened: 2019-07-09
+INFO     **** Results1 ****
+INFO      * ['3330', 'title 0', 'Anime/Animation']
+INFO      * ['1839', 'title 4000', 'Sports']
+INFO      * ['3039', 'title 0', 'Howto & Style']
+INFO      * ['2343', 'title 2000', 'Videoblogging']
+INFO      * ['2428', 'title 3000', 'Shows']
+INFO      * ['743', 'title 4000', 'Family']
+INFO      * ['2201', 'title 0', 'Movies']
+INFO      * ['2111', 'title 1000', 'Sci-Fi/Fantasy']
+INFO      * ['1627', 'title 1000', 'Documentary']
+INFO      * ['2237', 'title 4000', 'Science & Technology']
+INFO      * ['2325', 'title 1000', 'Drama']
+INFO      * ['3941', 'title 2000', 'Pets & Animals']
+INFO      * ['930', 'title 0', 'Movies']
+INFO      * ['1033', 'title 4000', 'Education']
+INFO      * ['679', 'title 1000', 'Music']
+INFO      * ['2467', 'title 2000', 'Gaming']
+INFO      * ['699', 'title 3000', 'Sci-Fi/Fantasy']
+INFO      * ['1234', 'title 0', 'Documentary']
+INFO      * ['3661', 'title 3000', 'Travel & Events']
+INFO      * ['708', 'title 1000', 'Foreign']
+INFO      * ['2592', 'title 0', 'Foreign']
+INFO      * ['870', 'title 4000', 'Shows']
+INFO      * ['1383', 'title 0', 'Trailers']
+INFO      * ['3710', 'title 3000', 'Autos & Vehicles']
+INFO      * ['1439', 'title 4000', 'Thriller']
+INFO      * ['794', 'title 1000', 'Shows']
 INFO     **** Results2 ****
 INFO      * All files downloaded to path: .temp
 INFO     Recv All Responses!
