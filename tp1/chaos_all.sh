@@ -9,4 +9,4 @@ fi
 
 KILL_FRECUENCY=$1
 
-./chaos.sh $KILL_FRECUENCY '^/acceptor$' '^/downloader$' '^/tag_unique$' '^/thumbnail_router$' '^/trending_router$' '^/trending_top$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$' '^/dropper_[[:digit:]]+$' '^/like_filter_[[:digit:]]+$'
+./chaos.sh $KILL_FRECUENCY '^/acceptor$' '^/downloader$' '^/tag_unique$' '^/thumbnail_router_[[:digit:]]+$' '^/trending_router$' '^/trending_top$' '^/thumbnail_[[:digit:]]+$' '^/joiner_[[:digit:]]+$' '^/dropper_[[:digit:]]+$' '^/like_filter_[[:digit:]]+$'

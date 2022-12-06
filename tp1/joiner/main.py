@@ -15,9 +15,12 @@ def main():
     logging.getLogger("pika").setLevel(logging.ERROR)
 
     prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
+    likes_instances = int(os.getenv("LIKES_INSTANCES"))
+    thumbnail_router_instances = int(os.getenv("GROUPER_INSTANCES"))
+
     instance_n = os.getenv("INSTANCE_NR") or '0'
     # Initialize server and start server loop
-    middleware = JoinerMiddlware(instance_n)
+    middleware = JoinerMiddlware(instance_n, likes_instances, thumbnail_router_instances)
     worker = Joiner(middleware, prev_pipeline_instances)
 
     worker.start()

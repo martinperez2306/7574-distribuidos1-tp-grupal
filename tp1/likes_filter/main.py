@@ -12,12 +12,12 @@ def main():
     # Log config parameters at the beginning of the program to verify the configuration
     # of the component
     logging.info("Likes Filter starting work")
-
+    instance_n = os.getenv("INSTANCE_NR") or '0'
     filter_qty = int(os.getenv("FILTER_QTY"))
     prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
     
     # Initialize server and start server loop
-    middleware = LikesFilterMiddlware()
+    middleware = LikesFilterMiddlware(instance_n)
     worker = LikesFilter(middleware, filter_qty, prev_pipeline_instances)
 
     worker.start()

@@ -50,7 +50,7 @@ class Joiner(HeartbeathedWorker):
                 parsed_message.message_id = self.id
                 logging.info(
                     f'Finish Recv Videos for {parsed_message.client_id}')
-                self.middleware.send_video_message(parsed_message.pack())
+                self.middleware.send_end_message(parsed_message.pack())
 
             return
 
@@ -61,7 +61,7 @@ class Joiner(HeartbeathedWorker):
                 video.content['country'], video.content['categoryId'])
             video.content.pop('categoryId')
             video.content['category'] = category_name
-            self.middleware.send_video_message(video.pack())
+            self.middleware.send_video_message(video.pack(), video.content['video_id'])
         except KeyError as err:
             logging.debug(f'Invalid key error: {err}')
 

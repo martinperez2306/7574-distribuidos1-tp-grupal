@@ -3,15 +3,17 @@ import logging
 from common.heartbeathed_worker import HeartbeathedWorker
 from common.message import CategoryMessage, MessageEnd, VideoMessage
 from datetime import datetime
+from common.end_message_tracker import EndMessageTracker
 from .model import ThumbnailGrouper
 
 
 class ThumbnailInstance(HeartbeathedWorker):
-    def __init__(self, middleware) -> None:
+    def __init__(self, middleware, prev_pipeline_instances) -> None:
         super().__init__(middleware)
         self.grouper = ThumbnailGrouper()
         self.batch_size = 30        
         self.message_count = 0
+        self.end_message_tracker = EndMessageTracker(prev_pipeline_instances)
 
     def run(self):
         self.middleware.recv_category_count(self.recv_category_count)
@@ -31,15 +33,25 @@ class ThumbnailInstance(HeartbeathedWorker):
         send_ack_flag = False
         self.message_count+=1
 
-
         if MessageEnd.is_message(message):
-            decoded_message = MessageEnd.decode(message)
-            decoded_message.message_id = self.id
 
-            logging.info(f'Finish Thumbnail Grouping Videos for Client: {decoded_message.client_id}')
-            self.middleware.send_result_message(decoded_message.pack())
-            send_ack_flag = True
-            return send_ack_flag
+            parsed_message = MessageEnd.decode(message)
+            logging.info(
+                    f'Recv end message from {parsed_message.client_id} and Instance: {parsed_message.message_id}')
+            self.end_message_tracker.add_end_message(parsed_message.client_id, parsed_message.message_id)
+            
+            if(self.end_message_tracker.is_finished(parsed_message.client_id)):
+                decoded_message = MessageEnd.decode(message)
+                decoded_message.message_id = self.id
+
+                logging.info(f'Finish Thumbnail Grouping Videos for Client: {decoded_message.client_id}')
+                self.middleware.send_result_message(decoded_message.pack())
+                send_ack_flag = True
+                return send_ack_flag
+
+            return False
+
+            
             
         video = VideoMessage.decode(message)
         try:

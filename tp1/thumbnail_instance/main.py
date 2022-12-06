@@ -13,12 +13,12 @@ def main():
     # of the component
     logging.info("Thumbnail Instance starting work")
     logging.getLogger("pika").setLevel(logging.ERROR)
-    
+    prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
     instance_n = os.getenv("INSTANCE_NR") or '0'
 
     # Initialize server and start server loop
     middleware = ThumbnailInstanceMiddlware(instance_n)
-    worker = ThumbnailInstance(middleware)
+    worker = ThumbnailInstance(middleware, prev_pipeline_instances)
 
     worker.start()
 

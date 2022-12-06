@@ -14,12 +14,14 @@ class Heartbeats:
         dropper_instances = int(config_params['dropper_instances'])
         trending_instances = int(config_params['trending_instances'])
         thumbnail_instances = int(config_params['thumbnail_instances'])
+        thumbnail_router_instances = int(config_params['router_thumbnail_instances'])
         like_filter_instances = int(config_params['like_filter_instances'])
         self._init_service_hearbeats("joiner", joiner_instances)
         self._init_service_hearbeats("dropper", dropper_instances)
         self._init_service_hearbeats("trending", trending_instances)
         self._init_service_hearbeats("thumbnail", thumbnail_instances)
         self._init_service_hearbeats("like_filter", like_filter_instances)
+        self._init_service_hearbeats("thumbnail_router", thumbnail_router_instances)
 
     def _init_service_hearbeats(self, service_name, service_instances):
         for i in range(service_instances):

@@ -10,10 +10,12 @@ CATEGORIES_QUEUE_PREFIX = 'categories_'
 PREFIX_JOINER_INPUT = 'joiner_input_'
 
 class JoinerMiddlware(Middleware):
-    def __init__(self, instance_nr) -> None:
+    def __init__(self, instance_nr, likes_instances, thumbnail_router_instances) -> None:
         super().__init__()
         self.joiner_input = PREFIX_JOINER_INPUT + instance_nr
-
+        self.likes_instances = likes_instances
+        self.thumbnail_router_instances = thumbnail_router_instances
+        
         self.channel.exchange_declare(exchange=CATEGORIES_EXCHANGE,
                                       exchange_type='fanout')
         
@@ -21,7 +23,7 @@ class JoinerMiddlware(Middleware):
                                       exchange_type='fanout')
         
         self.channel.exchange_declare(exchange=DISTRIBUTION_EXCHANGE,
-                                      exchange_type='fanout')
+                                      exchange_type='topic')
         
         self.channel.exchange_declare(exchange=JOINER_EXCHANGE,
                                       exchange_type='direct')
@@ -57,7 +59,11 @@ class JoinerMiddlware(Middleware):
     def send_category_count(self, message):
         super().send_to_exchange(CATEGORIES_COUNT_EXCHANGE, '', message)
 
-    def send_video_message(self, message):
-        super().send_to_exchange(DISTRIBUTION_EXCHANGE, '', message)
+    def send_video_message(self, message, id):
+        instance_likes = hash(id) % self.likes_instances
+        instance_router = hash(id) % self.thumbnail_router_instances
 
-    
+        super().send_to_exchange(DISTRIBUTION_EXCHANGE, f'{str(instance_likes)}.{str(instance_router)}', message)
+
+    def send_end_message(self, message):
+        super().send_to_exchange(DISTRIBUTION_EXCHANGE, 'end', message)

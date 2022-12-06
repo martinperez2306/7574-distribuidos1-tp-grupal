@@ -2,23 +2,33 @@ import logging
 
 from common.heartbeathed_worker import HeartbeathedWorker
 from common.message import EndResult1, MessageEnd, Result1, VideoMessage
+from common.end_message_tracker import EndMessageTracker
 from .model import ResultRepository
 
 class TagUnique(HeartbeathedWorker):
-    def __init__(self, middleware) -> None:
+    def __init__(self, middleware, prev_pipeline_instances) -> None:
         super().__init__(middleware)
         self.repository = ResultRepository()
+        self.end_message_tracker = EndMessageTracker(prev_pipeline_instances)
 
     def run(self):
         self.middleware.recv_video_message(self.recv_videos)
 
     def recv_videos(self, message):
-
         if MessageEnd.is_message(message):
-            logging.info(f'Finish Recv Videos')
+
             parsed_message = MessageEnd.decode(message)
-            end_message = EndResult1(parsed_message.client_id)
-            self.middleware.send_result_message(end_message.pack())
+            logging.info(
+                    f'Recv end message from {parsed_message.client_id} and Instance: {parsed_message.message_id}')
+            self.end_message_tracker.add_end_message(parsed_message.client_id, parsed_message.message_id)
+            
+            if(self.end_message_tracker.is_finished(parsed_message.client_id)):
+                parsed_message.message_id = self.id
+                logging.info(
+                    f'Finish Recv Videos for {parsed_message.client_id}')
+                end_message = EndResult1(parsed_message.client_id)
+                self.middleware.send_result_message(end_message.pack())
+
             return
 
         video = VideoMessage.decode(message)

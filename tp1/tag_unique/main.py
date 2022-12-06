@@ -13,10 +13,11 @@ def main():
     # of the component
     logging.info("Tag Filter and Unique starting work")
     logging.getLogger("pika").setLevel(logging.ERROR)
-
+    prev_pipeline_instances = int(os.getenv("N_PREV_WORKER_INSTANCES"))
+    
     # Initialize server and start server loop
     middleware = TagUniqueMiddlware()
-    worker = TagUnique(middleware)
+    worker = TagUnique(middleware, prev_pipeline_instances)
 
     worker.start()
 

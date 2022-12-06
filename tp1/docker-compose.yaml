@@ -26,7 +26,7 @@ services:
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
     volumes:
       - ./data/client0:/workspace/data
       - ./.tmp/client_0:/workspace/.temp
@@ -44,7 +44,7 @@ services:
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
     volumes:
       - ./data/client1:/workspace/data
       - ./.tmp/client_1:/workspace/.temp
@@ -62,7 +62,7 @@ services:
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
     volumes:
       - ./data/client2:/workspace/data
       - ./.tmp/client_2:/workspace/.temp
@@ -80,7 +80,7 @@ services:
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
     volumes:
       - ./data/client3:/workspace/data
       - ./.tmp/client_3:/workspace/.temp
@@ -98,7 +98,7 @@ services:
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
     volumes:
       - ./data/client4:/workspace/data
       - ./.tmp/client_4:/workspace/.temp
@@ -116,7 +116,7 @@ services:
       - LOGGING_LEVEL=INFO
       - FILE_READER_LINES=20
       - THUMBNAIL_PATH=.temp
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
     volumes:
       - ./data/client5:/workspace/data
       - ./.tmp/client_5:/workspace/.temp
@@ -146,9 +146,9 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=trending_router
       - LOGGING_LEVEL=INFO
-      - TRENDING_INSTANCES=2
-  thumbnail_router:
-    container_name: thumbnail_router
+      - TRENDING_INSTANCES=1
+  thumbnail_router_0:
+    container_name: thumbnail_router_0
     build:
       context: ./
       dockerfile: ./thumbnail_router/Dockerfile
@@ -158,10 +158,11 @@ services:
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=thumbnail_router
+      - SERVICE_ID=thumbnail_router_0
       - LOGGING_LEVEL=INFO
-      - N_PREV_WORKER_INSTANCES=2
-      - INSTANCES=2
+      - INSTANCE_NR=0
+      - N_PREV_WORKER_INSTANCES=1
+      - INSTANCES=1
   downloader:
     container_name: downloader
     build:
@@ -175,7 +176,7 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=downloader
       - LOGGING_LEVEL=INFO
-      - THUMBNAIL_INSTANCES=2
+      - THUMBNAIL_INSTANCES=1
   tag_unique:
     container_name: tag_unique
     build:
@@ -186,6 +187,7 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
+      - N_PREV_WORKER_INSTANCES=1
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=tag_unique
       - LOGGING_LEVEL=INFO
@@ -203,7 +205,7 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=trending_top
       - LOGGING_LEVEL=INFO
-      - TRENDING_INSTANCES=2
+      - TRENDING_INSTANCES=1
   joiner_0:
     container_name: joiner_0
     build:
@@ -215,25 +217,11 @@ services:
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - N_PREV_WORKER_INSTANCES=2
+      - N_PREV_WORKER_INSTANCES=1
       - SERVICE_ID=joiner_0
       - INSTANCE_NR=0
-      - LOGGING_LEVEL=INFO
-    
-  joiner_1:
-    container_name: joiner_1
-    build:
-      context: ./
-      dockerfile: ./joiner/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - N_PREV_WORKER_INSTANCES=2
-      - SERVICE_ID=joiner_1
-      - INSTANCE_NR=1
+      - LIKES_INSTANCES=1
+      - GROUPER_INSTANCES=1
       - LOGGING_LEVEL=INFO
     
   dropper_0:
@@ -249,23 +237,8 @@ services:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=dropper_0
       - LOGGING_LEVEL=INFO
-      - OUTPUT_INSTANCES=2
+      - OUTPUT_INSTANCES=1
       - INSTANCE_NR=0
-  dropper_1:
-    container_name: dropper_1
-    build:
-      context: ./
-      dockerfile: ./dropper/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=dropper_1
-      - LOGGING_LEVEL=INFO
-      - OUTPUT_INSTANCES=2
-      - INSTANCE_NR=1
   like_filter_0:
     container_name: like_filter_0
     build:
@@ -278,8 +251,9 @@ services:
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - LOGGING_LEVEL=INFO
+      - INSTANCE_NR=0
       - SERVICE_ID=like_filter_0
-      - N_PREV_WORKER_INSTANCES=2
+      - N_PREV_WORKER_INSTANCES=1
       - FILTER_QTY=5000000
   trending_0:
     container_name: trending_0
@@ -295,20 +269,6 @@ services:
       - SERVICE_ID=trending_0
       - LOGGING_LEVEL=INFO
       - INSTANCE_NR=0
-  trending_1:
-    container_name: trending_1
-    build:
-      context: ./
-      dockerfile: ./trending_instance/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=trending_1
-      - LOGGING_LEVEL=INFO
-      - INSTANCE_NR=1
   thumbnail_0:
     container_name: thumbnail_0
     build:
@@ -319,24 +279,11 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
+      - N_PREV_WORKER_INSTANCES=1
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=thumbnail_0
       - LOGGING_LEVEL=INFO
       - INSTANCE_NR=0
-  thumbnail_1:
-    container_name: thumbnail_1
-    build:
-      context: ./
-      dockerfile: ./thumbnail_instance/Dockerfile
-    entrypoint: python3 main.py
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=thumbnail_1
-      - LOGGING_LEVEL=INFO
-      - INSTANCE_NR=1
   watcher_0:
     container_name: watcher_0
     build:
@@ -352,11 +299,12 @@ services:
       - SERVICE_PORT=8080
       - LOGGING_LEVEL=INFO
       - INSTANCE_ID=0
-      - JOINER_INSTANCES=2
-      - DROPPER_INSTANCES=2
-      - TRENDING_INSTANCES=2
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
       - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=2
+      - ROUTER_THUMBNAIL_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
       - WATCHERS_INSTANCES=5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -376,11 +324,12 @@ services:
       - SERVICE_PORT=8080
       - LOGGING_LEVEL=INFO
       - INSTANCE_ID=1
-      - JOINER_INSTANCES=2
-      - DROPPER_INSTANCES=2
-      - TRENDING_INSTANCES=2
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
       - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=2
+      - ROUTER_THUMBNAIL_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
       - WATCHERS_INSTANCES=5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -400,11 +349,12 @@ services:
       - SERVICE_PORT=8080
       - LOGGING_LEVEL=INFO
       - INSTANCE_ID=2
-      - JOINER_INSTANCES=2
-      - DROPPER_INSTANCES=2
-      - TRENDING_INSTANCES=2
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
       - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=2
+      - ROUTER_THUMBNAIL_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
       - WATCHERS_INSTANCES=5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -424,11 +374,12 @@ services:
       - SERVICE_PORT=8080
       - LOGGING_LEVEL=INFO
       - INSTANCE_ID=3
-      - JOINER_INSTANCES=2
-      - DROPPER_INSTANCES=2
-      - TRENDING_INSTANCES=2
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
       - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=2
+      - ROUTER_THUMBNAIL_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
       - WATCHERS_INSTANCES=5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -448,11 +399,12 @@ services:
       - SERVICE_PORT=8080
       - LOGGING_LEVEL=INFO
       - INSTANCE_ID=4
-      - JOINER_INSTANCES=2
-      - DROPPER_INSTANCES=2
-      - TRENDING_INSTANCES=2
+      - JOINER_INSTANCES=1
+      - DROPPER_INSTANCES=1
+      - TRENDING_INSTANCES=1
       - LIKE_FILTER_INSTANCES=1
-      - THUMBNAIL_INSTANCES=2
+      - ROUTER_THUMBNAIL_INSTANCES=1
+      - THUMBNAIL_INSTANCES=1
       - WATCHERS_INSTANCES=5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

@@ -9,8 +9,8 @@ REPLICAS_TRENDING="${4:-1}"
 REPLICAS_THUMBNAIL="${5:-1}"
 REPLICAS_LIKES_FILTER="${6:-1}"
 REPLICAS_WATCHERS="${7:-1}"
-TRENDING_ROUTER_ENABLED="${8:-1}"
-THUMBNAIL_ROUTER_ENABLED="${9:-1}"
+REPLICAS_THUMBNAIL_ROUTER="${8:-1}"
+TRENDING_ROUTER_ENABLED="${9:-1}"
 DOWNLOADER_ENABLED="${10:-1}"
 TAG_UNIQUE_ENABLED="${11:-1}"
 TRENDING_TOP_ENABLED="${12:-1}"
@@ -100,11 +100,12 @@ then
   BASE+="${TRENDING_ROUTER_INSTANCE}"
 fi
 
-if [ $THUMBNAIL_ROUTER_ENABLED -eq 1 ]
-then
+for (( i = 0; i < $REPLICAS_THUMBNAIL_ROUTER; i++ )) 
+do
+  
   THUMBNAIL_ROUTER_INSTANCE="
-  thumbnail_router:
-    container_name: thumbnail_router
+  thumbnail_router_${i}:
+    container_name: thumbnail_router_${i}
     build:
       context: ./
       dockerfile: ./thumbnail_router/Dockerfile
@@ -114,13 +115,14 @@ then
         condition: service_healthy
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
-      - SERVICE_ID=thumbnail_router
+      - SERVICE_ID=thumbnail_router_${i}
       - LOGGING_LEVEL=INFO
+      - INSTANCE_NR=${i}
       - N_PREV_WORKER_INSTANCES=${REPLICAS_JOINER}
       - INSTANCES=${REPLICAS_THUMBNAIL}"
   
   BASE+="${THUMBNAIL_ROUTER_INSTANCE}"
-fi
+done
 
 if [ $DOWNLOADER_ENABLED -eq 1 ]
 then
@@ -156,6 +158,7 @@ then
       rabbitmq:
         condition: service_healthy
     environment:
+      - N_PREV_WORKER_INSTANCES=${REPLICAS_LIKES_FILTER}
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=tag_unique
       - LOGGING_LEVEL=INFO
@@ -204,6 +207,8 @@ do
       - N_PREV_WORKER_INSTANCES=${REPLICAS_DROPPER}
       - SERVICE_ID=joiner_${i}
       - INSTANCE_NR=${i}
+      - LIKES_INSTANCES=${REPLICAS_LIKES_FILTER}
+      - GROUPER_INSTANCES=${REPLICAS_THUMBNAIL_ROUTER}
       - LOGGING_LEVEL=INFO
     "
 
@@ -249,6 +254,7 @@ do
     environment:
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - LOGGING_LEVEL=INFO
+      - INSTANCE_NR=${i}
       - SERVICE_ID=like_filter_${i}
       - N_PREV_WORKER_INSTANCES=${REPLICAS_JOINER}
       - FILTER_QTY=${FILTER_QTY}"
@@ -292,6 +298,7 @@ do
       rabbitmq:
         condition: service_healthy
     environment:
+      - N_PREV_WORKER_INSTANCES=${REPLICAS_THUMBNAIL_ROUTER}
       - RABBIT_SERVER_ADDRESS=rabbitmq
       - SERVICE_ID=thumbnail_${i}
       - LOGGING_LEVEL=INFO
@@ -323,6 +330,7 @@ do
       - DROPPER_INSTANCES=$REPLICAS_DROPPER
       - TRENDING_INSTANCES=$REPLICAS_TRENDING
       - LIKE_FILTER_INSTANCES=$REPLICAS_LIKES_FILTER
+      - ROUTER_THUMBNAIL_INSTANCES=$REPLICAS_THUMBNAIL_ROUTER
       - THUMBNAIL_INSTANCES=$REPLICAS_THUMBNAIL
       - WATCHERS_INSTANCES=$REPLICAS_WATCHERS
     volumes:

@@ -9,4 +9,4 @@ fi
 
 KILL_FRECUENCY=$1
 
-./chaos.sh $KILL_FRECUENCY '^/thumbnail_router$' '^/trending_router$'
+./chaos.sh $KILL_FRECUENCY '^/thumbnail_router_[[:digit:]]+$' '^/trending_router$'
